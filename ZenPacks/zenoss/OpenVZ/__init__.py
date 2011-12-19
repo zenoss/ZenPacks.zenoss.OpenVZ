@@ -1,47 +1,42 @@
-# Nothing is required in this __init__.py, but it is an excellent place to do
-# many things in a ZenPack.
+##########################################################################
 #
-# The example below which is commented out by default creates a custom subclass
-# of the ZenPack class. This allows you to define custom installation and
-# removal routines for your ZenPack. If you don't need this kind of flexibility
-# you should leave the section commented out and let the standard ZenPack
-# class be used.
+#   Copyright 2009, 2011 Zenoss, Inc. All Rights Reserved.
 #
-# Code included in the global scope of this file will be executed at startup
-# in any Zope client. This includes Zope itself (the web interface) and zenhub.
-# This makes this the perfect place to alter lower-level stock behavior
-# through monkey-patching.
+##########################################################################
 
-# import Globals
-#
-# from Products.ZenModel.ZenPack import ZenPack as ZenPackBase
-# from Products.ZenUtils.Utils import unused
-#
-# unused(Globals)
-#
-#
-# class ZenPack(ZenPackBase):
-#
-#     # All zProperties defined here will automatically be created when the
-#     # ZenPack is installed.
-#     packZProperties = [
-#         ('zExampleString', 'default value', 'string'),
-#         ('zExampleInt', 411, 'int'),
-#         ('zExamplePassword', 'notsecure', 'password'),
-#         ]
-#
-#     def install(self, dmd):
-#         ZenPackBase.install(self, dmd)
-#
-#         # Put your customer installation logic here.
-#         pass
-#
-#     def remove(self, dmd, leaveObjects=False):
-#         if not leaveObjects:
-#             # When a ZenPack is removed the remove method will be called with
-#             # leaveObjects set to False. This means that you likely want to
-#             # make sure that leaveObjects is set to false before executing
-#             # your custom removal code.
-#             pass
-#
-#         ZenPackBase.remove(self, dmd, leaveObjects=leaveObjects)
+import logging
+log = logging.getLogger('zen.OpenVZ')
+
+import Globals
+
+from Products.ZenModel.Device import Device
+from Products.ZenRelations.RelSchema import ToManyCont, ToOne
+from Products.ZenModel.ZenPack import ZenPack as ZenPackBase
+from Products.ZenUtils.Utils import unused
+
+unused(Globals)
+
+
+# Add relations to the base device class.
+Device._relations += (('openvz_containers', ToManyCont(ToOne,
+    'ZenPacks.zenoss.OpenVZ.Container.Container', 'host')), )
+
+
+class ZenPack(ZenPackBase):
+    def install(self, app):
+        ZenPackBase.install(self, app)
+
+        self.rebuildRelations(app.zport.dmd)
+
+    def remove(self, app, leaveObjects=False):
+        if not leaveObjects:
+            Device._relations = tuple(
+                [x for x in Device._relations if x[0] != 'openvz_containers'])
+
+            self.rebuildRelations(app.zport.dmd)
+
+        ZenPackBase.remove(self, app, leaveObjects=leaveObjects)
+
+    def rebuildRelations(self, dmd):
+        for d in dmd.Devices.getSubDevicesGen():
+            d.buildRelations()
