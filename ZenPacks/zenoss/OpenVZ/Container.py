@@ -22,7 +22,7 @@ class Container(DeviceComponent, ManagedEntity):
         {'id': 'ostemplate', 'type': 'string', 'mode': 'w'},
         {'id': 've_root', 'type': 'string', 'mode': 'w'},
         {'id': 've_private', 'type': 'string', 'mode': 'w'},
-        {'id': 'onboot', 'type': 'bool', 'mode': 'w'},
+        {'id': 'onboot', 'type': 'boolean', 'mode': 'w'},
         )
 
     _relations = ManagedEntity._relations + (
