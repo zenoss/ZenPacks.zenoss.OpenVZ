@@ -4,6 +4,9 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:zcml="http://namespaces.zope.org/zcml">
 
+    <!-- Include Browser Code -->
+     <include package=".browser"/>
+
     <adapter
         provides=".interfaces.IContainerInfo"
         for=".Container.Container"
