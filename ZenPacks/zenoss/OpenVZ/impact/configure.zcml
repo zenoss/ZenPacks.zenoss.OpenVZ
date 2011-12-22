@@ -1,0 +1,17 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+    <include package="ZenPacks.zenoss.Impact" file="meta.zcml"/>
+
+    <subscriber
+        provides="ZenPacks.zenoss.Impact.impactd.interfaces.IRelationshipDataProvider"
+        for="Products.ZenModel.Device.Device"
+        factory=".adapters.DeviceRelationsProvider"
+        />
+
+    <subscriber
+        provides="ZenPacks.zenoss.Impact.impactd.interfaces.IRelationshipDataProvider"
+        for="ZenPacks.zenoss.OpenVZ.Container.Container"
+        factory=".adapters.ContainerRelationsProvider"
+        />
+
+</configure>

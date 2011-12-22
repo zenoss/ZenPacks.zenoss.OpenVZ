@@ -4,6 +4,12 @@
 #
 ##########################################################################
 
+# This modeler plugin can be tested on an OpenVZ host by running:
+# zenmodel run -v10 --device="10.0.1.2"
+#
+# This modeler plugin is also imported by zenhub, so you should check zenhub.log for any tracebacks if your
+# modeler plugin does not appear to be working.
+
 from Products.DataCollector.plugins.CollectorPlugin import CommandPlugin
 from Products.DataCollector.plugins.DataMaps import ObjectMap
 from ZenPacks.zenoss.OpenVZ.util import VZInfoParser  
@@ -60,19 +66,28 @@ class OpenVZ(CommandPlugin):
             # it gets these settings from relname, modname, and classname = modname
             om = self.objectMap() 
             if lines[pos] == "0":
-                    foundZero = True
-            om.id = self.prepId(lines[pos])
-            if lines[pos+1]:
+                foundZero = True
+                om.title = "CT0"
+                om.id = "0"
+                om.description = "Hardware Node"
+                om.onboot = False
+                om.ve_root = "N/A"
+                om.ve_private = "N/A"
+                om.container_status = "running"
+                om.ostemplate = "N/A"
+            else:    
+                if lines[pos+1]:
                     om.title = lines[pos+1]
-            om.description = lines[pos+2]
-            om.ostemplate = lines[pos+3]
-            om.ve_root = lines[pos+4]
-            om.ve_private = lines[pos+5]
-            om.onboot = False
-            if lines[pos] in vzinfo:
-                om.container_status = vzinfo[lines[pos]]
-            if lines[pos+6] == "yes":
-                om.onboot = True
+                om.description = lines[pos+3]
+                om.id = self.prepId(lines[pos])
+                om.ostemplate = lines[pos+2]
+                om.ve_root = lines[pos+4]
+                om.ve_private = lines[pos+5]
+                om.onboot = False
+                if lines[pos] in vzinfo:
+                        om.container_status = vzinfo[lines[pos]]
+                if lines[pos+6] == "yes":
+                        om.onboot = True
             pos += 8
             rm.append(om)
         if not foundZero:

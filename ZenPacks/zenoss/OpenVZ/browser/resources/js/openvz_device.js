@@ -51,8 +51,13 @@ ZC.ContainerGridPanel = Ext.extend(ZC.OpenVZStackComponentGridPanel, {
     
     constructor: function(config) {
         config = Ext.applyIf(config||{}, {
-            autoExpandColumn: 'ostemplate',
+            autoExpandColumn: 'description',
             componentType: 'OpenVZContainer',
+            /* New capability in 4.x: set the default sort field and order: */
+            sortInfo: {
+                field: 'id',
+                direction: 'ASC'
+            },
             fields: [
                 {name: 'uid'},
                 {name: 'id'},
@@ -85,12 +90,11 @@ ZC.ContainerGridPanel = Ext.extend(ZC.OpenVZStackComponentGridPanel, {
                 dataIndex: 'title',
                 header: _t('Name'),
                 sortable: true
-            },
+            },{
                 id: 'description',
                 dataIndex: 'description',
                 header: _t('Description'),
                 sortable: true,
-                width:80
             },{
                 id: 'guest_device',
                 dataIndex: 'guest_device',
@@ -105,6 +109,7 @@ ZC.ContainerGridPanel = Ext.extend(ZC.OpenVZStackComponentGridPanel, {
                 dataIndex: 'ostemplate',
                 header: _t('OS Template'),
                 sortable: true,
+                width: 120 
             },{
                 id: 'onboot',
                 dataIndex: 'onboot',
