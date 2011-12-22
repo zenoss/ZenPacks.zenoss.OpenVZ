@@ -60,13 +60,16 @@ ZC.ContainerGridPanel = Ext.extend(ZC.OpenVZStackComponentGridPanel, {
             },
             fields: [
                 {name: 'uid'},
+                {name: 'name'},
                 {name: 'id'},
                 {name: 'title'},
                 {name: 'severity'},
                 {name: 'container_status'},
-                {name: 'guest_device'},
+                {name: 'managed_device'},
                 {name: 'ostemplate'},
                 {name: 'description'},
+                {name: 'hostname'},
+                {name: 'ipaddrs'},
                 {name: 'onboot'},
                 {name: 'monitor'},
                 {name: 'monitored'},
@@ -96,12 +99,30 @@ ZC.ContainerGridPanel = Ext.extend(ZC.OpenVZStackComponentGridPanel, {
                 header: _t('Description'),
                 sortable: true,
             },{
-                id: 'guest_device',
-                dataIndex: 'guest_device',
-                header:_t('Guest Device'),
+                id: 'hostname',
+                dataIndex: 'hostname',
+                header: _t('Hostname'),
+                sortable: true,
+                width: 60
+            },{
+                id: 'ipaddrs',
+                dataIndex: 'ipaddrs',
+                header: _t('IP Addresses'),
+                sortable: false,
+                renderer: function(obj) {
+                    if (obj)
+                        return obj.join(" ");
+                },
+                width: 80
+            },{
+                id: 'managed_device',
+                dataIndex: 'managed_device',
+                header:_t('Device'),
                 renderer: function(obj) {
                     if (obj && obj.uid && obj.name) {
                         return Zenoss.render.link(obj.uid, undefined, obj.name);
+                    } else {
+                        return "unmanaged";
                     }
                 }
             },{

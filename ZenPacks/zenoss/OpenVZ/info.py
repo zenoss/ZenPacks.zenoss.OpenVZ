@@ -30,8 +30,17 @@ class ContainerInfo(BaseComponentInfo):
     implements(IContainerInfo)
 
     container_status = ProxyProperty('container_status')
-    ostemplate = ProxyProperty('ostemplate')
     description = ProxyProperty('description')
+    hostname = ProxyProperty('hostname')
+    ipaddrs = ProxyProperty('ipaddrs')
+    
+    # put @property first, then @info...
+    @property
+    @info
+    def managed_device(self):
+        return self._object.getManagedDevice()    
+
+    onboot = ProxyProperty('onboot')
+    ostemplate = ProxyProperty('ostemplate')
     ve_root = ProxyProperty('ve_root')
     ve_private = ProxyProperty('ve_private')
-    onboot = ProxyProperty('onboot')

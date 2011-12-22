@@ -90,7 +90,7 @@ class host(CommandParser):
                 #
                 # To test: zensendevent -d 10.0.1.2 -p 106 -s Info -k openvz_container_status_change -o "new_status=weird" "container status change" 
                 result.events.append(dict(
-                        summary="container created",
+                        summary="OpenVZ container created",
                         severity="2",
                         eventClassKey="openvz_container_created",
                         component = veid,
@@ -100,9 +100,9 @@ class host(CommandParser):
             elif existing_veids[veid] != current_veids[veid]:
                 event_count += 1
                 if current_veids[veid] == "running":
-                    summary = "container started"
+                    summary = "OpenVZ container started"
                 else:
-                    summary = "container " + current_veids[veid] 
+                    summary = "OpenVZ container " + current_veids[veid] 
                 result.events.append(dict(
                         # limited to 128 characters:
                         summary=summary,
@@ -121,7 +121,7 @@ class host(CommandParser):
             # in existing set, not in current - VEID disappeared
             event_count += 1
             result.events.append(dict(
-                summary="container destroyed",
+                summary="OpenVZ container destroyed",
                 severity="2",
                 eventClassKey="openvz_container_destroyed",
                 component = veid,

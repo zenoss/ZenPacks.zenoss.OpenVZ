@@ -14,19 +14,23 @@ class Container(DeviceComponent, ManagedEntity):
     meta_type = portal_type = "OpenVZContainer"
 
     container_status = None
-    ostemplate = None
     description = None
+    hostname = None
+    ipaddrs = []
+    onboot = None
+    ostemplate = None
     ve_root = None
     ve_private = None
-    onboot = None
 
     _properties = ManagedEntity._properties + (
-        {'id': 'ostemplate', 'type': 'string', 'mode': 'w'},
-        {'id': 'description', 'type': 'string', 'mode': 'w'},
         {'id': 'container_status', 'type': 'string', 'mode': 'w'},
+        {'id': 'description', 'type': 'string', 'mode': 'w'},
+        {'id': 'hostname', 'type': 'string', 'mode': 'w'},
+        {'id': 'ipaddrs', 'type': 'lines', 'mode': 'w'},
+        {'id': 'onboot', 'type': 'boolean', 'mode': 'w'},
+        {'id': 'ostemplate', 'type': 'string', 'mode': 'w'},
         {'id': 've_root', 'type': 'string', 'mode': 'w'},
         {'id': 've_private', 'type': 'string', 'mode': 'w'},
-        {'id': 'onboot', 'type': 'boolean', 'mode': 'w'},
         )
 
     _relations = ManagedEntity._relations + (
@@ -51,3 +55,25 @@ class Container(DeviceComponent, ManagedEntity):
 
     def device(self):
         return self.host()
+
+    def getManagedDevice(self):
+        if self.id == "0":
+            return self.device()
+        for ip in self.ipaddrs:
+
+            # search "manageIp":
+            # This first test will only search the primary IP that is used to monitor/model the device
+            # which shows up in the top-left corner of the device's page:
+
+            device = self.dmd.Devices.findDeviceByIdOrIp(ip)
+            if device:
+                return device
+            
+            # search additional IP addresses that may be associated with interfaces on a device:
+
+            foundip = self.dmd.Networks.findIp(ip) 
+            if foundip.device():
+                return foundip.device()
+
+        return None
+        

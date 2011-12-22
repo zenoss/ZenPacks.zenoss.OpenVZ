@@ -15,6 +15,15 @@
         zcml:condition="installed ZenPacks.zenoss.Impact"
         package=".impact"
         />
+
+    <!-- Analytics -->
+    <configure zcml:condition="installed ZenPacks.zenoss.ZenETL">
+        <adapter
+            provides="Products.Zuul.interfaces.IReportable"
+            for=".Container.Container"
+            factory=".analytics.ContainerReportable"
+            />
+    </configure>
     
     <adapter
         provides=".interfaces.IContainerInfo"

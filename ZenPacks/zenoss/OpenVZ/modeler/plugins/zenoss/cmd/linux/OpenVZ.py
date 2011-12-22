@@ -41,7 +41,7 @@ class OpenVZ(CommandPlugin):
     # above, first set of ^ is compname, second set is relname, third set is ID. See how compname changes length, relname
     # is always the last part before the ID........
     # classname will be set to "ZenPacks.zenoss.OpenVZ.Container.Container", auto-calculated based on modname (dup last name)
-    command = 'if [ ! -r /proc/user_beancounters ]; then echo "no"; else echo "yes"; %s; echo "#veinfo-stop"; for fn in /etc/vz/conf/[0-9]*.conf; do ( VEID="${fn##*/}"; VEID="${VEID%%.conf}"; source $fn; echo; echo $VEID; echo $NAME; echo $OSTEMPLATE; echo $DESCRIPTION; echo $VE_ROOT; echo $VE_PRIVATE; echo $ONBOOT); done; fi' % VZInfoParser.command
+    command = 'if [ ! -r /proc/user_beancounters ]; then echo "no"; else echo "yes"; %s; echo "#veinfo-stop"; unset NAME HOSTNAME OSTEMPLATE IP_ADDRESS NETIF DESCRIPTION VE_ROOT VE_PRIVATE ONBOOT; for fn in /etc/vz/conf/[0-9]*.conf; do ( VEID="${fn##*/}"; VEID="${VEID%%.conf}"; source $fn; echo; echo $VEID; echo $NAME; echo $HOSTNAME; echo $OSTEMPLATE; echo $IP_ADDRESS; echo $NETIF; echo $DESCRIPTION; echo $VE_ROOT; echo $VE_PRIVATE; echo $ONBOOT); done; fi' % VZInfoParser.command
 
     def process(self, device, results, log):
         # call self.relMap() helper method that initializes relname and compname for me
@@ -75,20 +75,31 @@ class OpenVZ(CommandPlugin):
                 om.ve_private = "N/A"
                 om.container_status = "running"
                 om.ostemplate = "N/A"
+                om.ipaddrs=[]
             else:    
+                om.id = self.prepId(lines[pos])
+                # NAME
                 if lines[pos+1]:
                     om.title = lines[pos+1]
-                om.description = lines[pos+3]
-                om.id = self.prepId(lines[pos])
-                om.ostemplate = lines[pos+2]
-                om.ve_root = lines[pos+4]
-                om.ve_private = lines[pos+5]
+                om.hostname = lines[pos+2]
+                om.ostemplate = lines[pos+3]
+                om.ipaddrs = []
+                for ip in lines[pos+4].split():
+                    om.ipaddrs.append(ip)
+                #for netif in lines[pos+5].split(";"):
+                #    for arg in netif.split(","):
+                #        key = arg.split("=")[0]
+                #        if key == "ifname":
+                #            om.ipaddrs.append(arg[len(key):])
+                om.description = lines[pos+6]
+                om.ve_root = lines[pos+7]
+                om.ve_private = lines[pos+8]
                 om.onboot = False
                 if lines[pos] in vzinfo:
                         om.container_status = vzinfo[lines[pos]]
-                if lines[pos+6] == "yes":
+                if lines[pos+9] == "yes":
                         om.onboot = True
-            pos += 8
+            pos += 11 
             rm.append(om)
         if not foundZero:
             return []
