@@ -13,13 +13,17 @@ from Products.ZenModel.ZenossSecurity import ZEN_CHANGE_DEVICE
 class Container(DeviceComponent, ManagedEntity):
     meta_type = portal_type = "OpenVZContainer"
 
+    container_status = None
     ostemplate = None
+    description = None
     ve_root = None
     ve_private = None
     onboot = None
 
     _properties = ManagedEntity._properties + (
         {'id': 'ostemplate', 'type': 'string', 'mode': 'w'},
+        {'id': 'description', 'type': 'string', 'mode': 'w'},
+        {'id': 'container_status', 'type': 'string', 'mode': 'w'},
         {'id': 've_root', 'type': 'string', 'mode': 'w'},
         {'id': 've_private', 'type': 'string', 'mode': 'w'},
         {'id': 'onboot', 'type': 'boolean', 'mode': 'w'},

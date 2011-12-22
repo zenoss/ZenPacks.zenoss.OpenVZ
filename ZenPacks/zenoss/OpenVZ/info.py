@@ -29,7 +29,9 @@ class BaseComponentInfo(ComponentInfo):
 class ContainerInfo(BaseComponentInfo):
     implements(IContainerInfo)
 
+    container_status = ProxyProperty('container_status')
     ostemplate = ProxyProperty('ostemplate')
+    description = ProxyProperty('description')
     ve_root = ProxyProperty('ve_root')
     ve_private = ProxyProperty('ve_private')
     onboot = ProxyProperty('onboot')

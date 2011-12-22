@@ -12,15 +12,13 @@ import Globals
 from Products.ZenModel.Device import Device
 from Products.ZenRelations.RelSchema import ToManyCont, ToOne
 from Products.ZenModel.ZenPack import ZenPack as ZenPackBase
-from Products.ZenUtils.Utils import unused
+from Products.ZenUtils.Utils import unused, monkeypatch
 
 unused(Globals)
-
 
 # Add relations to the base device class.
 Device._relations += (('openvz_containers', ToManyCont(ToOne,
     'ZenPacks.zenoss.OpenVZ.Container.Container', 'host')), )
-
 
 class ZenPack(ZenPackBase):
     def install(self, app):

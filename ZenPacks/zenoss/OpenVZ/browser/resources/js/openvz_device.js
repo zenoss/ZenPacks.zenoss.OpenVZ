@@ -51,18 +51,18 @@ ZC.ContainerGridPanel = Ext.extend(ZC.OpenVZStackComponentGridPanel, {
     
     constructor: function(config) {
         config = Ext.applyIf(config||{}, {
-            autoExpandColumn: 'title',
+            autoExpandColumn: 'ostemplate',
             componentType: 'OpenVZContainer',
             fields: [
                 {name: 'uid'},
                 {name: 'id'},
                 {name: 'title'},
                 {name: 'severity'},
-		{name: 'guest_device'},
-		{name: 'ostemplate'},
-		{name: 've_root'},
-		{name: 've_private'},
-		{name: 'onboot'},
+                {name: 'container_status'},
+                {name: 'guest_device'},
+                {name: 'ostemplate'},
+                {name: 'description'},
+                {name: 'onboot'},
                 {name: 'monitor'},
                 {name: 'monitored'},
                 {name: 'locking'}
@@ -78,13 +78,19 @@ ZC.ContainerGridPanel = Ext.extend(ZC.OpenVZStackComponentGridPanel, {
                 id: 'id',
                 dataIndex: 'id',
                 header: _t('VEID'),
-		width: 40,
-		sortable: true
+                width: 40,
+                sortable: true
             },{
                 id: 'title',
                 dataIndex: 'title',
                 header: _t('Name'),
-		sortable: true
+                sortable: true
+            },
+                id: 'description',
+                dataIndex: 'description',
+                header: _t('Description'),
+                sortable: true,
+                width:80
             },{
                 id: 'guest_device',
                 dataIndex: 'guest_device',
@@ -99,26 +105,18 @@ ZC.ContainerGridPanel = Ext.extend(ZC.OpenVZStackComponentGridPanel, {
                 dataIndex: 'ostemplate',
                 header: _t('OS Template'),
                 sortable: true,
-                width: 65
-            },{
-                id: 've_root',
-                dataIndex: 've_root',
-                header: _t('VE Root'),
-                sortable: true,
-                width: 100
-            },{
-                id: 've_private',
-                dataIndex: 've_private',
-                header: _t('VE Private'),
-                sortable: true,
-                width: 100 
             },{
                 id: 'onboot',
                 dataIndex: 'onboot',
                 header: _t('On Boot'),
                 renderer: Zenoss.render.checkbox,
                 sortable: true,
-                width: 40 
+                width: 60 
+            },{
+                id: 'container_status',
+                dataIndex: 'container_status',
+                header:_t('Status'),
+                width: 65,
             },{
                 id: 'monitored',
                 dataIndex: 'monitored',
