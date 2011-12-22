@@ -57,7 +57,6 @@ class ContainerRelationsProvider(BaseRelationsProvider):
         # always want to define impact relationships from both sides like this. 
 
         yield ImpactEdge(
-            devguid,
             IGlobalIdentifier(self._object.device()).getGUID(),
             IGlobalIdentifier(self._object).getGUID(),
             self.relationship_provider
