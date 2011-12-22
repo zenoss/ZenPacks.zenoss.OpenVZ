@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-/* To make sure that all of your ZCML is right, run "zendmd". If it starts with no errors, you're OK! */
+<!-- To make sure that all of your ZCML is right, run "zendmd". If it starts with no errors, you're OK! -->
 
 <configure
     xmlns="http://namespaces.zope.org/zope"
