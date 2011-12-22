@@ -1,0 +1,10 @@
+To install ZenPacks, there is only one daemon that needs to be running: zeneventserver.
+
+Best practice is to install ZenPacks:
+
+$ zenoss stop
+$ zeneventserver start
+$ zenpack --install foo.egg
+$ zenoss start
+
+For 3.x, use zeoctl instead of zeneventserver.
