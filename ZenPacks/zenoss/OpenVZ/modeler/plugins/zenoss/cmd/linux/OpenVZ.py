@@ -95,14 +95,14 @@ class OpenVZ(CommandPlugin):
                 om.ve_private = lines[pos+8]
                 om.onboot = False
                 if lines[pos] in vzinfo:
-                        om.container_status = vzinfo[lines[pos]]
+                    om.container_status = vzinfo[lines[pos]]
                 if om.container_status == "running":
-                        # only update IPs if running so the IPs stick around if the container is stopped during remodel,
-                        # so we still have IPs for container component <-> managed device correlation :)
-                        for ip in lines[pos+4].split():
-                                om.ipaddrs.append(ip)
+                    # only update IPs if running so the IPs stick around if the container is stopped during remodel,
+                    # so we still have IPs for container component <-> managed device correlation :)
+                    for ip in lines[pos+4].split():
+                        om.ipaddrs.append(ip)
                 if lines[pos+9] == "yes":
-                        om.onboot = True
+                    om.onboot = True
             pos += 11 
             rm.append(om)
         if not foundZero:
