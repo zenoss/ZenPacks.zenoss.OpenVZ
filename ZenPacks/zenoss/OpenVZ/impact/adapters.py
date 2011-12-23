@@ -15,6 +15,11 @@ from ZenPacks.zenoss.Impact.impactd.relations import ImpactEdge
 
 from ZenPacks.zenoss.OpenVZ.Container import Container
 
+# To test, restart everything and then run:
+# zenimpactgraph run --reset
+
+# This will load new impact rules.
+
 class BaseRelationsProvider(object):
     relationship_provider = "OpenVZ"
 
