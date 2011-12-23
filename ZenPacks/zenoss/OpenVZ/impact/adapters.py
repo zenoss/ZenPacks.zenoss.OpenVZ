@@ -52,17 +52,11 @@ class DeviceRelationsProvider(BaseRelationsProvider):
             # us underneath it. We are now going to say that we *are* the component, from
             # the container device's perspective. We depend on it, and it depends on us:
 
-            yield ImpactEdge(
-                IGlobalIdentifier(comp).getGUID(),
-                IGlobalIdentifier(self._object.device()).getGUID(),
-                self.relationship_provider 
-            )
+            e1 = IGlobalIdentifier(comp).getGUID(),
+            e2 = IGlobalIdentifier(self._object.device()).getGUID(),
 
-            yield ImpactEdge(
-                IGlobalIdentifier(self._object.device()).getGUID(),
-                IGlobalIdentifier(comp).getGUID(),
-                self.relationship_provider 
-            )
+            yield ImpactEdge( e1, e2, self.relationship_provider )
+            yield ImpactEdge( e2, e1, self.relationship_provider )
 
 
 class ContainerRelationsProvider(BaseRelationsProvider):
@@ -90,14 +84,9 @@ class ContainerRelationsProvider(BaseRelationsProvider):
 
         md = self._object.getManagedDevice()
         if md:
-            yield ImpactEdge(
-                IGlobalIdentifier(self._object.device()).getGUID(),
-                IGlobalIdentifier(md).getGUID(),
-                self.relationship_provider
-            )
-            yield ImpactEdge(
-                IGlobalIdentifier(md).getGUID(),
-                IGlobalIdentifier(self._object.device()).getGUID(),
-                self.relationship_provider
-            )
+            e1 = IGlobalIdentifier(self._object.device()).getGUID()
+            e2 = IGlobalIdentifier(md).getGUID()
+
+            yield ImpactEdge( self.relationship_provider, e1, e2 )
+            yield ImpactEdge( self.relationship_provider, e2, e1 )
 
