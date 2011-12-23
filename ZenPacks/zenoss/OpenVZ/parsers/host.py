@@ -10,6 +10,8 @@ from ZenPacks.zenoss.OpenVZ.util import VZInfoParser
 
 class host(CommandParser):
 
+    # This method is imported and run by zenhub and has direct access to the model...
+
     def dataForParser(self, context, datapoint):
         if datapoint.id != "container_status":
             return
@@ -17,6 +19,8 @@ class host(CommandParser):
         for c in context.openvz_containers():
            out[c.id] = c.container_status
         return out
+    
+    # This method is imported and run by zencommand and does not have direct access to the model...
 
     def processResults(self, cmd, result):
 

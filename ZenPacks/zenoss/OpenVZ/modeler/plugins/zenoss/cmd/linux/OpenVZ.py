@@ -43,6 +43,11 @@ class OpenVZ(CommandPlugin):
     # classname will be set to "ZenPacks.zenoss.OpenVZ.Container.Container", auto-calculated based on modname (dup last name)
     command = 'if [ ! -r /proc/user_beancounters ]; then echo "no"; else echo "yes"; %s; echo "#veinfo-stop"; unset NAME HOSTNAME OSTEMPLATE IP_ADDRESS NETIF DESCRIPTION VE_ROOT VE_PRIVATE ONBOOT; for fn in /etc/vz/conf/[0-9]*.conf; do ( VEID="${fn##*/}"; VEID="${VEID%%.conf}"; source $fn; echo; echo $VEID; echo $NAME; echo $HOSTNAME; echo $OSTEMPLATE; echo $IP_ADDRESS; echo $NETIF; echo $DESCRIPTION; echo $VE_ROOT; echo $VE_PRIVATE; echo $ONBOOT); done; fi' % VZInfoParser.command
 
+#   imported and called from zenhub... and have access to the model
+#   def condition()
+
+#   This method is imported and run by zenmodeler... and do not have access to the model
+
     def process(self, device, results, log):
         # call self.relMap() helper method that initializes relname and compname for me
         # 
@@ -86,11 +91,7 @@ class OpenVZ(CommandPlugin):
                 om.ipaddrs = []
                 for ip in lines[pos+4].split():
                     om.ipaddrs.append(ip)
-                #for netif in lines[pos+5].split(";"):
-                #    for arg in netif.split(","):
-                #        key = arg.split("=")[0]
-                #        if key == "ifname":
-                #            om.ipaddrs.append(arg[len(key):])
+                # veth macaddr info on lines[pos+5]
                 om.description = lines[pos+6]
                 om.ve_root = lines[pos+7]
                 om.ve_private = lines[pos+8]
