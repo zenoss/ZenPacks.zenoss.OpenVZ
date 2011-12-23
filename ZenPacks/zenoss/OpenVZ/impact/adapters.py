@@ -57,8 +57,8 @@ class DeviceRelationsProvider(BaseRelationsProvider):
             # us underneath it. We are now going to say that we *are* the component, from
             # the container device's perspective. We depend on it, and it depends on us:
 
-            e1 = IGlobalIdentifier(comp).getGUID(),
-            e2 = IGlobalIdentifier(self._object.device()).getGUID(),
+            e1 = IGlobalIdentifier(comp).getGUID()
+            e2 = IGlobalIdentifier(self._object.device()).getGUID()
 
             yield ImpactEdge( e1, e2, self.relationship_provider )
             yield ImpactEdge( e2, e1, self.relationship_provider )
