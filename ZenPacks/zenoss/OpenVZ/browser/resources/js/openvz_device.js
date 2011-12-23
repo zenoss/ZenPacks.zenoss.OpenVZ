@@ -1,3 +1,5 @@
+/* This javascript is handed to the client's browser as-is, so any renderers or anything
+else can be debugged in the browser using a JavaScript console or similar. */
 
 (function(){
 

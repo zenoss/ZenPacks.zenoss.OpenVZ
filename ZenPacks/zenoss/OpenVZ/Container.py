@@ -9,9 +9,29 @@ from Products.ZenModel.ManagedEntity import ManagedEntity
 from Products.ZenRelations.RelSchema import ToOne, ToManyCont
 from Products.ZenModel.ZenossSecurity import ZEN_CHANGE_DEVICE
 
-
 class Container(DeviceComponent, ManagedEntity):
     meta_type = portal_type = "OpenVZContainer"
+
+    # PersistentList()
+    # PersistentDict()
+    #
+    # The attributes below are stored by Zope. If you are storing a simple
+    # type like an int or string, Zope will be able to tell when its value is
+    # updated. Also, if you use a list or a dict, and the list or dict itself
+    # is re-created each time it is updated, Zope will be able to tell that
+    # the list or dict is updated.
+    #
+    # However, if you are changing, adding or removing elements from an existing
+    # list, or adding, removing or updating dictionary key/value pairs, Zope will
+    # not be able to tell that the updates have happened. There are two ways
+    # to deal with this. The first is to explicitly call _p_changed on your Component
+    # once you have made any changes that need to persist:
+    # 
+    # myContainer._p_changed = True
+    # 
+    # The other method is to use PersistentList() and PersistentDict() as your
+    # list and dict objects when you create them, which will allow Zope to detect
+    # that they have been changed and persist the changes in the ZODB.
 
     container_status = None
     description = None

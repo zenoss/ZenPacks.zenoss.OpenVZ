@@ -17,7 +17,8 @@ from Products.Zuul.interfaces import ICatalogTool
 
 unused(Globals)
 
-# Add relations to the base device class.
+# Add relations to the base device class. This is the best method for adding capabilities to an existing
+# Linux system. 
 Device._relations += (('openvz_containers', ToManyCont(ToOne,
     'ZenPacks.zenoss.OpenVZ.Container.Container', 'host')), )
 
