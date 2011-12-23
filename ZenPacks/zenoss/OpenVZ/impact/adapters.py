@@ -12,6 +12,7 @@ from Products.ZenUtils.guid.interfaces import IGlobalIdentifier
 
 from ZenPacks.zenoss.Impact.impactd.interfaces import IRelationshipDataProvider
 from ZenPacks.zenoss.Impact.impactd.relations import ImpactEdge
+from ZenPacks.zenoss.Impact.stated.interfaces import IStateProvider
 
 from ZenPacks.zenoss.OpenVZ.Container import Container
 
@@ -95,3 +96,33 @@ class ContainerRelationsProvider(BaseRelationsProvider):
             yield ImpactEdge( self.relationship_provider, e1, e2 )
             yield ImpactEdge( self.relationship_provider, e2, e1 )
 
+# This following code is designed to set the the impact state of a container to down when
+# the container is not running, thus causing any related services to be treated as down.
+
+class ContainerStateProvider(object):
+    implements(IStateProvider)
+
+    def __init__(self,adapted):
+        self._object = adapted
+
+    @property
+    def eventClasses(self):
+        return ('/Status',)
+
+    @property
+    def excludeClasses(self):
+        return None
+
+    @property
+    def eventHandlerType(self):
+        return "WORST"
+
+    @property
+    def stateType(self):
+        return 'AVAILABILITY'
+
+    def calcState(self, events):
+        if self._object.container_status == "running":
+            return "UP", None
+        else:
+            return "DOWN", None

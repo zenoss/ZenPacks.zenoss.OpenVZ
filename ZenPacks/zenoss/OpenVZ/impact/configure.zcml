@@ -18,4 +18,8 @@
         factory=".adapters.ContainerRelationsProvider"
         />
 
+    <subscriber factory=".adapters.ContainerStateProvider" for="..Container.Container"
+        provides="ZenPacks.zenoss.Impact.stated.interfaces.IStateProvider"
+    />
+
 </configure>

@@ -89,8 +89,6 @@ class OpenVZ(CommandPlugin):
                 om.hostname = lines[pos+2]
                 om.ostemplate = lines[pos+3]
                 om.ipaddrs = []
-                for ip in lines[pos+4].split():
-                    om.ipaddrs.append(ip)
                 # veth macaddr info on lines[pos+5]
                 om.description = lines[pos+6]
                 om.ve_root = lines[pos+7]
@@ -98,6 +96,11 @@ class OpenVZ(CommandPlugin):
                 om.onboot = False
                 if lines[pos] in vzinfo:
                         om.container_status = vzinfo[lines[pos]]
+                if om.container_status == "running":
+                        # only update IPs if running so the IPs stick around if the container is stopped during remodel,
+                        # so we still have IPs for container component <-> managed device correlation :)
+                        for ip in lines[pos+4].split():
+                                om.ipaddrs.append(ip)
                 if lines[pos+9] == "yes":
                         om.onboot = True
             pos += 11 
