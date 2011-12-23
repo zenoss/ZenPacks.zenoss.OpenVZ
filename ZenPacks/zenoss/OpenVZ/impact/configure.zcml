@@ -2,6 +2,10 @@
 
     <include package="ZenPacks.zenoss.Impact" file="meta.zcml"/>
 
+<!-- registering as subscribers will get all edges defined in all ZenPacks, so
+     impact edges are cumulative for a device, and IRelationshipDataProvider.getEdges()
+     will add new edges. -->
+
     <subscriber
         provides="ZenPacks.zenoss.Impact.impactd.interfaces.IRelationshipDataProvider"
         for="Products.ZenModel.Device.Device"

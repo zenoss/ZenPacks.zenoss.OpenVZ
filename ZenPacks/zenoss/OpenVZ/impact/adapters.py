@@ -43,6 +43,27 @@ class DeviceRelationsProvider(BaseRelationsProvider):
                 IGlobalIdentifier(ve).getGUID(),
                 self.relationship_provider
             )
+        
+        comp = self._object.getOpenVZComponentOnHost()
+        if comp:
+
+            # we are a device monitored thru SNMP or ssh that is an OpenVZ container. The
+            # call above found the host we are running on, and the component representing
+            # us underneath it. We are now going to say that we *are* the component, from
+            # the container device's perspective. We depend on it, and it depends on us:
+
+            yield ImpactEdge(
+                IGlobalIdentifier(comp).getGUID(),
+                IGlobalIdentifier(self._object.device()).getGUID(),
+                self.relationship_provider 
+            )
+
+            yield ImpactEdge(
+                IGlobalIdentifier(self._object.device()).getGUID(),
+                IGlobalIdentifier(comp).getGUID(),
+                self.relationship_provider 
+            )
+
 
 class ContainerRelationsProvider(BaseRelationsProvider):
     implements(IRelationshipDataProvider)
@@ -61,3 +82,22 @@ class ContainerRelationsProvider(BaseRelationsProvider):
             IGlobalIdentifier(self._object).getGUID(),
             self.relationship_provider
         )
+
+        # Try to find a device that exists because we are running net-snmp or have ssh monitoring
+        # going direct to the container. If we find such a device, then this device *is* the container.
+        # We, the container component, are dependent on this device. The device is dependent on us.
+        # The code below yields both ImpactEdges from the container component's perspective.
+
+        md = self._object.getManagedDevice()
+        if md:
+            yield ImpactEdge(
+                IGlobalIdentifier(self._object.device()).getGUID(),
+                IGlobalIdentifier(md).getGUID(),
+                self.relationship_provider
+            )
+            yield ImpactEdge(
+                IGlobalIdentifier(md).getGUID(),
+                IGlobalIdentifier(self._object.device()).getGUID(),
+                self.relationship_provider
+            )
+
