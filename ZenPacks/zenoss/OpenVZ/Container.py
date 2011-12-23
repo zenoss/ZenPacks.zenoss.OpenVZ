@@ -92,7 +92,7 @@ class Container(DeviceComponent, ManagedEntity):
             # search additional IP addresses that may be associated with interfaces on a device:
 
             foundip = self.dmd.Networks.findIp(ip) 
-            if foundip.device():
+            if foundip and foundip.device():
                 return foundip.device()
 
         return None
