@@ -32,11 +32,19 @@ class Container(DeviceComponent, ManagedEntity):
     # The other method is to use PersistentList() and PersistentDict() as your
     # list and dict objects when you create them, which will allow Zope to detect
     # that they have been changed and persist the changes in the ZODB.
+    #
 
+    # IMPORTANT:
+    #
+    # Any changes to the model below will require a restart of zenhub so it is aware
+    # of the new model. You will also need to restart zenwebserver so it can access
+    # any new properties or methods.
+    
     container_status = None
     description = None
     hostname = None
     ipaddrs = []
+    macaddrs = []
     onboot = None
     ostemplate = None
     ve_root = None
@@ -47,6 +55,7 @@ class Container(DeviceComponent, ManagedEntity):
         {'id': 'description', 'type': 'string', 'mode': 'w'},
         {'id': 'hostname', 'type': 'string', 'mode': 'w'},
         {'id': 'ipaddrs', 'type': 'lines', 'mode': 'w'},
+        {'id': 'macaddrs', 'type': 'lines', 'mode': 'w'},
         {'id': 'onboot', 'type': 'boolean', 'mode': 'w'},
         {'id': 'ostemplate', 'type': 'string', 'mode': 'w'},
         {'id': 've_root', 'type': 'string', 'mode': 'w'},
@@ -76,9 +85,14 @@ class Container(DeviceComponent, ManagedEntity):
     def device(self):
         return self.host()
 
+    # debug this method by running zenwebserver debug, or by using zendmd and calling it directly...
+
     def getManagedDevice(self):
         if self.id == "0":
             return self.device()
+
+        # VENET MATCHING BY IP ADDRESS (venet has no mac addresses)
+
         for ip in self.ipaddrs:
 
             # search "manageIp":
@@ -95,5 +109,12 @@ class Container(DeviceComponent, ManagedEntity):
             if foundip and foundip.device():
                 return foundip.device()
 
+        # VETH MATCHING BY MAC ADDRESS (because we got 'em :)
+
+        cat = self.dmd.ZenLinkManager._getCatalog(layer=2)
+        if cat:
+            for mac in self.macaddrs:
+                brains = cat(macaddress=mac)
+                if brains:
+                    return brains[0].getObject().device()
         return None
-        
