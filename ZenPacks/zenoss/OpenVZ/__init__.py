@@ -40,6 +40,11 @@ def getOpenVZComponentOnHost(self):
                 for our_ip in iface.getIpAddresses():
                     if c_ip == our_ip.split("/")[0]:
                         return c        
+        for c_mac in c.macaddrs:
+            for iface in self.os.interfaces():
+                our_mac = iface.getInterfaceMacaddress().lower()
+                if our_mac == c_mac:
+                    return c
     return
 
 # old-school monkeypatch
