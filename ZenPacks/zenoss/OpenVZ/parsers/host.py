@@ -132,3 +132,13 @@ class host(CommandParser):
                 old_status = existing_veids[veid],
                 new_status = None
             ))
+        
+    # severity:
+# 0 = clear (green) - can clear existing events - 
+# a clear will happen if the following match in the method: fingerprint device|component|eventClass|eventKey 
+#                                                                 (optional)           (optional)
+# 1 = debug (grey)
+# 2 = info (blue)
+# 3 = warning (yellow)
+# 4 = error (orange)
+# 5 = critical (red)
