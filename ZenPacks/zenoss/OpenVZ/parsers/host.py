@@ -13,20 +13,50 @@ class host(CommandParser):
     # This method is imported and run by zenhub and has direct access to the model...
 
     def dataForParser(self, context, datapoint):
+
+        # We are using this method to stuff data inside a 'container_status'
+        # datapoint which in turn is then pased to processResults(), below. The
+        # data we are stuffing in the datapoint is container status information
+        # for all existing containters. This is the current status known by
+        # Zenoss that is stored in each container component. We pass this along
+        # so that we can later see the previous status, when reading in new
+        # status. And then we can figure out if we need to send an event -- if
+        # that status has changed.
+
+        # This trick is needed because processResults() is run by zencommand
+        # and does not have direct access to the model.
+
+        # Only provide extra data if we are handling the 'container_status'
+        # datapoint:
+
         if datapoint.id != "container_status":
             return
         out = {}
         for c in context.openvz_containers():
            out[c.id] = c.container_status
+
+        # Return dictionary of existing container status info in "102" (VEID) :
+        # "running" format:
+        
         return out
     
-    # This method is imported and run by zencommand and does not have direct access to the model...
+    # This method is imported and run by zencommand and does not have direct
+    # access to the model...
 
     def processResults(self, cmd, result):
 
-        # find a point with container_status, otherwise return
+        # We have defined an openvz datasource for our container. It has a
+        # datapoint called "container_status" that really isn't used for
+        # recording RRD data. But having this datapoint allows us to create a
+        # data pipeline for throwing events related to container status
+        # changes. We just don't write any RRD data into the point at the very
+        # end.
+
         for p in cmd.points:
             if p.id == "container_status":
+                
+                # grab container status info we provided in dataForParser():
+
                 existing_veids = p.data
                 break
         else:
@@ -93,13 +123,25 @@ class host(CommandParser):
                 # the ability to update the model direct without using DeviceProxy().
                 #
                 # To test: zensendevent -d 10.0.1.2 -p 106 -s Info -k openvz_container_status_change -o "new_status=weird" "container status change" 
+                #
+                # An overview of event severity:
+                #
+                # 0 = clear (green) - can clear existing events - 
+                # a clear will happen if the following match in the method: fingerprint device|component|eventClass|eventKey 
+                #                                                                             (optional)           (optional)
+                # 1 = debug (grey)
+                # 2 = info (blue)
+                # 3 = warning (yellow)
+                # 4 = error (orange)
+                # 5 = critical (red)                
+
                 result.events.append(dict(
-                        summary="OpenVZ container created",
-                        severity="2",
-                        eventClassKey="openvz_container_created",
-                        component = veid,
-                        old_status = None,
-                        new_status = current_veids[veid]
+                    summary="OpenVZ container created",
+                    severity="2",
+                    eventClassKey="openvz_container_created",
+                    component = veid,
+                    old_status = None,
+                    new_status = current_veids[veid]
                 ))
             elif existing_veids[veid] != current_veids[veid]:
                 event_count += 1
@@ -108,13 +150,13 @@ class host(CommandParser):
                 else:
                     summary = "OpenVZ container " + current_veids[veid] 
                 result.events.append(dict(
-                        # limited to 128 characters:
-                        summary=summary,
-                        severity="2",
-                        eventClassKey="openvz_container_status_change",
-                        component = veid,
-                        old_status = existing_veids[veid],
-                        new_status = current_veids[veid]
+                    # limited to 128 characters:
+                    summary=summary,
+                    severity="2",
+                    eventClassKey="openvz_container_status_change",
+                    component = veid,
+                    old_status = existing_veids[veid],
+                    new_status = current_veids[veid]
                 ))
         e_set = set(existing_veids.keys())
         e_set.discard("0")
@@ -133,12 +175,4 @@ class host(CommandParser):
                 new_status = None
             ))
         
-    # severity:
-# 0 = clear (green) - can clear existing events - 
-# a clear will happen if the following match in the method: fingerprint device|component|eventClass|eventKey 
-#                                                                 (optional)           (optional)
-# 1 = debug (grey)
-# 2 = info (blue)
-# 3 = warning (yellow)
-# 4 = error (orange)
-# 5 = critical (red)
+
