@@ -43,6 +43,9 @@ class host(CommandParser):
     # This method is imported and run by zencommand and does not have direct
     # access to the model...
 
+    # The processResults() method runs once for every OpenVZ host. It will be passed the full
+    # set of datapoints
+
     def processResults(self, cmd, result):
 
         # We have defined an openvz datasource for our container. It has a
