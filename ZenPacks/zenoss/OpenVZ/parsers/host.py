@@ -175,7 +175,7 @@ class host(CommandParser):
                 eventClassKey="openvz_container_destroyed",
                 component = veid,
                 old_status = existing_veids[veid],
-                new_status = None
+                new_status = "destroyed"
             ))
         
 
