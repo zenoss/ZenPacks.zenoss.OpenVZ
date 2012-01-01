@@ -1,0 +1,48 @@
+# When container is destroyed during monitoring, model is not updated. Container is listed and status is still
+# set to "stopped" (was stopped before) -- should be fixed.
+
+# For container status changes on remodel, throw events just like how we throw events on container status change.
+# not yet done.
+
+# CONVERT ALL PAGES VALUES TO BYTES
+# DETECT "UNLIMITED" VALUES AND DON'T WRITE THIS DATA OUT TO RRD (NAN)
+# GET UNAME AND USE THIS TO DETERMINE PAGE SIZE
+# FIGURE OUT A WAY TO DETERMINE IF WE ARE RUNNING 32-BIT OR 64-BIT CONTAINERS SO WE CAN THEN USE THE APPROPRIATE MAXINT CHECK
+
+
+# data sources:
+        # /proc/user_beancounters
+        # vzlist (running/stopped, etc. and IPADDR... for each CTID)
+        # /proc/vz/vestat:
+        # calculate HZ
+        # http://wiki.openvz.org/Vestat
+        #    user, nice, system, uptime (jiffies)
+        #    idle, strv, uptime, used (cycles) (strv isn't used, used is used cycles of VE's on all CPUs)
+        #    maxlat, totlat, numsched - latency stats in cycles, maxlat = how long VE had to wait before it got CPU time, totlat/numsched gives average scheduling latency (Virtuozo only)
+        #    user, idle, system time counters, nice time counter, strv time counter?
+        #    used?
+        #    maxlat
+        #    totlat
+        #    numsched
+
+        # parse /proc/user_beancounters
+ 
+# TODO: generate informational events for when a container is restarted
+
+Add virtual component to represent (All Containers), for:
+    # failcnt total
+    # memory total (total physpages of all containers = amount of RAM used by all containers on the system)
+
+Actually, no virtual component. I am going to upgrade the master node parser to tally up the totals for all containers on the system. Graphs will be associated with the master node, rather than a virtual "All containers" component. This is the easiest way to do things. Then we can model utilization and node-wide higher-level data like utilization.
+
+Optimizations --
+    Is there a better way to record "unlimited (LONG_MAX)" in rrd?
+
+# memory usage by container:
+
+    kernel: kmemsize(bytes) + tcpsndbuf(byes) + tcprcvbuf(bytes) + othersockbuf(bytes) + dgramrcvbuf(bytes)
+    user-space memory: physpages(cur) * 4096 (x86,x86_64) or (16KB) (ia64)
+    memory: kernel + user-space memory 
+    container utilization of system:
+        memory/RAM size on host 0.8 to 1 is normal, and 1 is maximum
+    commitment level: all-containers(oomguarpages(bar) * 4096 + kmemsize(lim) + allsocketbuf(lim)) / (ram + swap) 
