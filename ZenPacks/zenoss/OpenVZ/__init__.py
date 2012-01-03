@@ -10,6 +10,7 @@ log = logging.getLogger('zen.OpenVZ')
 import Globals
 
 from Products.ZenModel.Device import Device
+from Products.ZenModel.DeviceHW import DeviceHW
 from Products.ZenRelations.RelSchema import ToManyCont, ToOne
 from Products.ZenModel.ZenPack import ZenPack as ZenPackBase
 from Products.ZenUtils.Utils import unused, monkeypatch
@@ -21,6 +22,17 @@ unused(Globals)
 # Linux system. 
 Device._relations += (('openvz_containers', ToManyCont(ToOne,
     'ZenPacks.zenoss.OpenVZ.Container.Container', 'host')), )
+
+# Add some new properties to device.hw, which we will use for recording the OS architecture as well as
+# pagesize. Set defaults and add only if they don't already exist:
+
+if not hasattr(DeviceHW, 'page_size'):
+    DeviceHW.page_size = 4096
+    DeviceHW._properties += ({ 'id' : 'pagesize', 'type': 'int', 'mode': 'w'},)
+
+if not hasattr(DeviceHW, 'arch'):
+    DeviceHW.arch = "x86_64"
+    DeviceHW._properties += ({ 'id' : 'arch', 'type' : 'string', 'mode': 'w'},)
 
 @monkeypatch("Products.ZenModel.Device.Device")
 def getOpenVZComponentOnHost(self):

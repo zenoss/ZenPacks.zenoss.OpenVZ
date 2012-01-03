@@ -5,7 +5,7 @@
 ##########################################################################
 
 # This modeler plugin can be tested on an OpenVZ host by running:
-# zenmodel run -v10 --device="10.0.1.2"
+# zenmodeler run -v10 --device="10.0.1.2"
 #
 # This modeler plugin is also imported by zenhub, so you should check zenhub.log for any tracebacks if your
 # modeler plugin does not appear to be working.
@@ -41,7 +41,7 @@ class OpenVZ(CommandPlugin):
     # above, first set of ^ is compname, second set is relname, third set is ID. See how compname changes length, relname
     # is always the last part before the ID........
     # classname will be set to "ZenPacks.zenoss.OpenVZ.Container.Container", auto-calculated based on modname (dup last name)
-    command = 'if [ ! -r /proc/user_beancounters ]; then echo "no"; else echo "yes"; %s; echo "#veinfo-stop"; unset NAME HOSTNAME OSTEMPLATE IP_ADDRESS NETIF DESCRIPTION VE_ROOT VE_PRIVATE ONBOOT; for fn in /etc/vz/conf/[0-9]*.conf; do ( VEID="${fn##*/}"; VEID="${VEID%%.conf}"; source $fn; echo; echo $VEID; echo $NAME; echo $HOSTNAME; echo $OSTEMPLATE; echo $IP_ADDRESS; echo $NETIF; echo $DESCRIPTION; echo $VE_ROOT; echo $VE_PRIVATE; echo $ONBOOT); done; fi' % VZInfoParser.command
+    command = 'if [ ! -r /proc/user_beancounters ]; then echo "no"; else echo "yes"; p="$(which python)"; [ -z "$py" ] && echo 4096 || $py -c "import resource; print(resource.getpagesize())"; /usr/bin/env uname -m; %s; echo "#veinfo-stop"; unset NAME HOSTNAME OSTEMPLATE IP_ADDRESS NETIF DESCRIPTION VE_ROOT VE_PRIVATE ONBOOT; for fn in /etc/vz/conf/[0-9]*.conf; do ( VEID="${fn##*/}"; VEID="${VEID%%.conf}"; source $fn; echo; echo $VEID; echo $NAME; echo $HOSTNAME; echo $OSTEMPLATE; echo $IP_ADDRESS; echo $NETIF; echo $DESCRIPTION; echo $VE_ROOT; echo $VE_PRIVATE; echo $ONBOOT); done; fi' % VZInfoParser.command
 
 #   imported and called from zenhub... and have access to the model
 #   def condition()
@@ -56,7 +56,13 @@ class OpenVZ(CommandPlugin):
         if lines[0] != "yes":
             # we are not in a container or on a host
             return []   
-        pos = 1 
+        try:
+            page_size = int(lines[1])
+        except ValueError:
+            page_size = 4096
+        arch = lines[2]
+        hostmap = ObjectMap({"page_size" : page_size, "arch" : arch}, compname="hw")
+        pos = 3 
         infolines = []
         while lines[pos] != "#veinfo-stop":
                 infolines.append(lines[pos])
@@ -133,4 +139,4 @@ class OpenVZ(CommandPlugin):
         # an objectmap - 
         # a list of relmaps, objectmaps
 
-        return rm
+        return [hostmap, rm]
