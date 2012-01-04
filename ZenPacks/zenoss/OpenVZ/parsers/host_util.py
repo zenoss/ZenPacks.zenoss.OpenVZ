@@ -10,6 +10,11 @@ from ZenPacks.zenoss.OpenVZ.util import VZInfoParser
 
 class host_util(CommandParser):
 
+    # dataForParser is run by zenhub and has direct access to model -- stuff in page size and arch:
+
+    def dataForParser(self, context, datapoint):
+        return ( context.hw.arch, context.hw.page_size )
+
     # This method is imported and run by zencommand and does not have direct
     # access to the model...
 
@@ -48,6 +53,8 @@ class host_util(CommandParser):
         # "C" = sum of values from all containers.
 
         for point in cmd.points:
+            mult = False
+            arch, page_size = point.data
             idsplit = point.id.split(".")
             if len(idsplit) != 2:
                 continue
@@ -56,5 +63,16 @@ class host_util(CommandParser):
             pmetric, pclass = idsplit
             if pmetric == "failrate":
                 pnt = "failcnt"
-            result.values.append((point, metrics[pclass][pmetric]))
+            elif pmetric[-5:] == "bytes":
+                pnt = pmetric[:-5] + "pages"
+                mult = page_size
+            else:
+                pnt = pmetric 
+            if pnt in metrics[pclass]:
+                if mult:
+                    # already converted to int earlier for tallying:
+                    val = metrics[pclass][pnt] * mult
+                else:
+                    val = metrics[pclass][pnt]
+            result.values.append((point, val))
         return
