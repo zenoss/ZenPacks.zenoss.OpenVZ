@@ -9,6 +9,13 @@ from Products.ZenRRD.CommandParser import CommandParser
  
 class containers(CommandParser):
 
+    # dataForParser is run by zenhub and has direct access to model -- stuff in page size and arch:
+
+    def dataForParser(self, context, datapoint):
+
+        h = context.host().hw
+        return ( h.arch, h.page_size )
+
     def processResults(self, cmd, result):
     
         # This code is run once for each container. Zenoss detects we are running the exact same command on all containers,
@@ -16,7 +23,6 @@ class containers(CommandParser):
         # function multiple times.
 
         # We will get the output of /proc/user_beancounters, and parse it:
-
         lines=cmd.result.output.split('\n')
         version=lines[0].split()[1]
         pos = 2
@@ -47,6 +53,8 @@ class containers(CommandParser):
         
         # For each datapoint we need to provide data for (sent to us by Zenoss, based on the datapoint definitions in UI...)
         for point in cmd.points:
+            mult = False 
+            arch, page_size = point.data
             # point.component is the ID of the component. In our case, this is the VEID:    
             if point.component in metrics:
 
@@ -57,21 +65,26 @@ class containers(CommandParser):
                 # add the datapoints of the data that they are actually interested in, and as long as the name matches, we
                 # grab the data they want. 
 
-                if point.id in metrics[point.component]:
-                
+                if point.id == "failrate":
                     # We support a special datapoint called "failrate" which can be a DERIVED RRD, used to trigger when
                     # we have an incremented failcnt. This is very useful for firing off events to alert when a failcnt
                     # has been incremented, but not very useful for anything else.
+                    pnt = "failcnt"
+                elif point.id[-5:] == "bytes":
+                    pnt = point.id[:-5] + "pages"
+                    mult = page_size
+                else:
+                    pnt = point.id
 
-                    if point.id == "failrate":
-                        pnt = "failcnt"
-                    else:
-                        pnt = point.id
-                    
+                if pnt in metrics[point.component]:
+                
                     # OK, append the point along with the (currently string) data to the result.values list. This will
                     # hand it back to Zenoss to update the RRD data:
-
-                    result.values.append((point, metrics[point.component][pnt]))
+                    if mult:
+                        val = int(metrics[point.component][pnt]) * mult
+                    else:
+                        val = metrics[point.component][pnt]
+                    result.values.append((point, val))
 
         # This method doesn't return anything explicitly, so just return:
 
