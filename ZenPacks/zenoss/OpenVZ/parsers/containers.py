@@ -9,6 +9,9 @@ from Products.ZenRRD.CommandParser import CommandParser
  
 class containers(CommandParser):
 
+    long_max_64 = 9223372036854775807
+    long_max_32 = 2147483647
+
     # dataForParser is run by zenhub and has direct access to model -- stuff in page size and arch:
 
     def dataForParser(self, context, datapoint):
@@ -32,7 +35,9 @@ class containers(CommandParser):
             sp = lines[pos].split()
             if len(sp) == 7:
                 veid = sp[0][:-1]
-            elif len(sp) == 6 and sp[0] != "dummy":
+                # we have kmemsize on this line: we need to process it...
+                sp = sp[1:]
+            if len(sp) == 6 and sp[0] != "dummy":
                 # resource held maxheld barrier limit failcnt
                 r = sp[0]
                 if veid not in metrics:
@@ -52,39 +57,67 @@ class containers(CommandParser):
         # data) or int (for GAUGE data) for us.
         
         # For each datapoint we need to provide data for (sent to us by Zenoss, based on the datapoint definitions in UI...)
+        if len(cmd.points):
+            arch, page_size = cmd.points[0].data
+            if arch in [ "x86_64", "ia64" ]:
+                lmax = self.long_max_64
+            else:
+                lmax = self.long_max_32
         for point in cmd.points:
-            mult = False 
-            arch, page_size = point.data
             # point.component is the ID of the component. In our case, this is the VEID:    
-            if point.component in metrics:
+            
+            if point.component not in metrics:
+                continue
+            
+            mult = 1
 
-                # OK, VEID match, and now we match the metric too. Note that for this match to take place, the user must
-                # have defined a datapoint in the UI called something like "physpages.maxheld". If they follow this pattern,
-                # we will find a match in the data we grabbed from beancounters and update the RRD data. This way, we don't
-                # need to pre-define tons of data points which will result in huge amounts of RRD data. Users just need to
-                # add the datapoints of the data that they are actually interested in, and as long as the name matches, we
-                # grab the data they want. 
+            # OK, VEID match, and now we match the metric too. Note that for this match to take place, the user must
+            # have defined a datapoint in the UI called something like "physpages.maxheld". If they follow this pattern,
+            # we will find a match in the data we grabbed from beancounters and update the RRD data. This way, we don't
+            # need to pre-define tons of data points which will result in huge amounts of RRD data. Users just need to
+            # add the datapoints of the data that they are actually interested in, and as long as the name matches, we
+            # grab the data they want. 
+            
+            psplit = point.id.split(".")
+            # pname = eg. "physpages"
+            pname = psplit[0]
+            # psuf = eg. "barrier", or None
+            if len(psplit) == 2:
+                psuf = psplit[1]
+            else:
+                psuf = None
+            if pname[-5:] == "bytes":
+                # source data is equivalent pages data:
+                pnt = pname[:-5] + "pages"
+                # add .limit, .barrier, .maxheld if we have it:
+                if psuf:
+                    pnt += "." + psuf
+                mult = page_size
+            else:
+                # no tweaks necessary, use original datapoint name as source:
+                pnt = point.id
+            if psuf == "failrate":
+                # We support a special datapoint called "failrate" which can be a DERIVED RRD, used to trigger when
+                # we have an incremented failcnt. This is very useful for firing off events to alert when a failcnt
+                # has been incremented, but not very useful for anything else.
+                # source data is failcnt:
+                psuf = "failcnt"
+        
+            if psuf and psuf[:4] ==  "fail":
+                # don't multiply the failcnt/rate
+                mult = 1
 
-                if point.id == "failrate":
-                    # We support a special datapoint called "failrate" which can be a DERIVED RRD, used to trigger when
-                    # we have an incremented failcnt. This is very useful for firing off events to alert when a failcnt
-                    # has been incremented, but not very useful for anything else.
-                    pnt = "failcnt"
-                elif point.id[-5:] == "bytes":
-                    pnt = point.id[:-5] + "pages"
-                    mult = page_size
-                else:
-                    pnt = point.id
-
-                if pnt in metrics[point.component]:
+            if pnt in metrics[point.component]:
+            
+                # OK, append the point along with the (currently string) data to the result.values list. This will
+                # hand it back to Zenoss to update the RRD data:
                 
-                    # OK, append the point along with the (currently string) data to the result.values list. This will
-                    # hand it back to Zenoss to update the RRD data:
-                    if mult:
-                        val = int(metrics[point.component][pnt]) * mult
-                    else:
-                        val = metrics[point.component][pnt]
-                    result.values.append((point, val))
+                val = int(metrics[point.component][pnt]) * mult
+
+                if psuf in [ "limit", "barrier" ] and ( ( val == lmax ) or ( val == 0 ) ):
+                    # encountered an "unlimited" value - don't record this in RRD data (so it will be NaN)
+                    continue 
+                result.values.append((point, val))
 
         # This method doesn't return anything explicitly, so just return:
 
