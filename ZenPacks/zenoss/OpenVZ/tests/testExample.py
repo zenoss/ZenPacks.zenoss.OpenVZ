@@ -12,7 +12,9 @@ from Products.ZenTestCase.BaseTestCase import BaseTestCase
 
 
 class TestExample(BaseTestCase):
-    def afterSetup(self):
+    def afterSetUp(self):
+        super(TestExample, self).afterSetUp()
+
         # You can use the afterSetup method to create a proper environment for
         # your tests to execute in, or to run common code between the tests.
         self.device = self.dmd.Devices.createInstance('testDevice')
@@ -31,6 +33,6 @@ def test_suite():
     suite = TestSuite()
 
     # Add your BaseTestCase subclasses here to have them executed.
-    # suite.addTest(makeSuite(TestExample))
+    suite.addTest(makeSuite(TestExample))
 
     return suite
