@@ -88,14 +88,9 @@ class containers(CommandParser):
                 psuf = None
             if pname[-5:] == "bytes":
                 # source data is equivalent pages data:
-                pnt = pname[:-5] + "pages"
-                # add .limit, .barrier, .maxheld if we have it:
-                if psuf:
-                    pnt += "." + psuf
+                pname = pname[:-5] + "pages"
                 mult = page_size
-            else:
-                # no tweaks necessary, use original datapoint name as source:
-                pnt = point.id
+            
             if psuf == "failrate":
                 # We support a special datapoint called "failrate" which can be a DERIVED RRD, used to trigger when
                 # we have an incremented failcnt. This is very useful for firing off events to alert when a failcnt
@@ -103,9 +98,12 @@ class containers(CommandParser):
                 # source data is failcnt:
                 psuf = "failcnt"
         
-            if psuf and psuf[:4] ==  "fail":
-                # don't multiply the failcnt/rate
-                mult = 1
+            pnt = pname
+            if psuf:
+                pnt += "." + psuf
+                if psuf[:4] == "fail":
+                    # don't multiply the failcnt/rate
+                  mult = 1
 
             if pnt in metrics[point.component]:
             

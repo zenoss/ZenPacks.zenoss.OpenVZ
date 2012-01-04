@@ -38,41 +38,60 @@ class host_util(CommandParser):
                     veid = "host"
                 else:
                     veid = "containers"
-            elif len(sp) == 6 and sp[0] != "dummy":
-                # resource held maxheld barrier limit failcnt
+                # have kmemsize on this line, still need to parse:
+                sp = sp[1:]
+            if len(sp) == 6 and sp[0] != "dummy":
                 r = sp[0]
                 if veid not in metrics:
                     metrics[veid] = {}
                 for key, val in (( r , sp[1]),( "%s.failcnt" % r , sp[5])):
+                    # we are doing a cumulative total (tally) for all containers, as well as the host (VEID 0)
                     if key not in metrics[veid]:
                         metrics[veid][key] = 0
                     metrics[veid][key] += int(val)
             pos += 1
 
-        # We now have metrics["0"]["physpages"] and metrics["C"]["physpages"], as well as failcnts.
+        # We now have metrics["host"]["physpages"] and metrics["containers"]["physpages"], as well as failcnts:
+        # metrics["containers"]["physpages.failcnt"]
         # "C" = sum of values from all containers.
 
+        if len(cmd.points):
+            arch, page_size = cmd.points[0].data
+
         for point in cmd.points:
-            mult = False
-            arch, page_size = point.data
+            mult = 1
             idsplit = point.id.split(".")
             if len(idsplit) != 2:
                 continue
             # pmetric = something like "physpages"
             # pclass = "containers" or "host"
             pmetric, pclass = idsplit
-            if pmetric == "failrate":
-                pnt = "failcnt"
-            elif pmetric[-5:] == "bytes":
-                pnt = pmetric[:-5] + "pages"
+            psplit = pmetric.split(".")
+            pname = psplit[0]
+            if len(psplit) == 2:
+                psuf = psplit[1]
+            else:
+                psuf = None
+
+            if pname[-5:] == "bytes":
+                pname = pname[:-5] + "pages"
                 mult = page_size
             else:
-                pnt = pmetric 
+                pnt = point.id
+
+            if psuf == "failrate":
+                psuf = "failcnt"
+ 
+            pnt = pname
+            if psuf:
+                pnt += "." + psuf
+                if psuf[:4] == "fail":
+                    # don't multiply failcnt/rate
+                    mult = 1
+ 
             if pnt in metrics[pclass]:
-                if mult:
-                    # already converted to int earlier for tallying:
-                    val = metrics[pclass][pnt] * mult
-                else:
-                    val = metrics[pclass][pnt]
+                # already converted to int earlier for tallying:
+                val = metrics[pclass][pnt] * mult
             result.values.append((point, val))
+
         return
