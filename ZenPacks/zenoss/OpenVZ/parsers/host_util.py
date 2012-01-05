@@ -13,7 +13,7 @@ class host_util(CommandParser):
     # dataForParser is run by zenhub and has direct access to model -- stuff in page size and arch:
 
     def dataForParser(self, context, datapoint):
-        return ( context.hw.arch, context.hw.page_size )
+        return ( context.hw.arch, context.hw.page_size, context.hw.totalMemory, context.os.totalSwap )
 
     # This method is imported and run by zencommand and does not have direct
     # access to the model...
@@ -56,23 +56,57 @@ class host_util(CommandParser):
         # "C" = sum of values from all containers.
 
         if len(cmd.points):
-            arch, page_size = cmd.points[0].data
+            arch, page_size, ram_bytes, swap_bytes = cmd.points[0].data
+        
+        # precalc:
 
+        # utilization.allocated - privvmpages(cur)
+        # commitmentlevel.allocated - vmguarpages(bar)
+        # restrictions.allocated - privvmpages(lim) (recommended: 1 or below)
+        # utilization.totalram physpages(cur) - can't be more than 1
+        # utilization.totalmem - oomguarpages(cur)
+        # commitmentlevel.totalmem - oomguarpages(bar) (bad if more than 1)
+
+        ut_a = 0
+        ut_rs = 0
+
+        sockbuf = [ "tcprcvbuf", "tcpsndbuf", "dgramrcvbuf", "othersockbuf" ]
+        # other stuff we need:
+        otherbuf = [ "privvmpages", "oomguarpages", "kmemsize", "physpages" ]
+
+        ok = True
+        for key in sockbuf + otherbuf:
+            if key not in metrics["containers"]:
+                ok = False
+        if ok:
+            asb = 0
+            for key in sockbuf:
+                asb += metrics["containers"][key] 
+
+            ut_a = ((metrics["containers"]["privvmpages"] * page_size) + metrics["containers"]["kmemsize"] + asb)
+            ut_rs = ((metrics["containers"]["oomguarpages"] * page_size) + metrics["containers"]["kmemsize"] + asb)
+            ut_r = ((metrics["containers"]["physpages"] * page_size) + metrics["containers"]["kmemsize"] + asb)
+
+            metrics["utilization"] = {}
+            metrics["utilization"]["allocated"] = float(ut_a)/(ram_bytes + swap_bytes)
+            metrics["utilization"]["ramswap"] = float(ut_rs)/(ram_bytes + swap_bytes)
+            metrics["utilization"]["ram"] = float(ut_rs)/(ram_bytes)
+    
+        # we are looking for datapoints in this format now:
+        # [containers|host|utilization].metric[.failcnt|failrate] (note: we are supporting failcnt/failrate only)
+        #
+        # For "utilization", we support "allocated" and "ramswap" as metrics.
+ 
         for point in cmd.points:
             mult = 1
             idsplit = point.id.split(".")
-            if len(idsplit) != 2:
-                continue
-            # pmetric = something like "physpages"
-            # pclass = "containers" or "host"
-            pmetric, pclass = idsplit
-            psplit = pmetric.split(".")
-            pname = psplit[0]
-            if len(psplit) == 2:
-                psuf = psplit[1]
-            else:
+            if len(idsplit) == 2:
+                pclass, pname = idsplit
                 psuf = None
-
+            elif len(idsplit) == 3:
+                pname, pclass, psuf = idsplit
+            else:
+                continue
             if pname[-5:] == "bytes":
                 pname = pname[:-5] + "pages"
                 mult = page_size
@@ -89,7 +123,7 @@ class host_util(CommandParser):
                     # don't multiply failcnt/rate
                     mult = 1
  
-            if pnt in metrics[pclass]:
+            if pclass in metrics and pnt in metrics[pclass]:
                 # already converted to int earlier for tallying:
                 val = metrics[pclass][pnt] * mult
             result.values.append((point, val))

@@ -964,7 +964,7 @@ True
 ZenPacks.zenoss.OpenVZ.parsers.host_util
 </property>
 <tomanycont id='datapoints'>
-<object id='physbytes.containers' module='Products.ZenModel.RRDDataPoint' class='RRDDataPoint'>
+<object id='containers.physbytes' module='Products.ZenModel.RRDDataPoint' class='RRDDataPoint'>
 <property select_variable="rrdtypes" type="selection" id="rrdtype" mode="w" >
 GAUGE
 </property>
@@ -972,7 +972,23 @@ GAUGE
 True
 </property>
 </object>
-<object id='physpages.containers' module='Products.ZenModel.RRDDataPoint' class='RRDDataPoint'>
+<object id='utilization.allocated' module='Products.ZenModel.RRDDataPoint' class='RRDDataPoint'>
+<property select_variable="rrdtypes" type="selection" id="rrdtype" mode="w" >
+GAUGE
+</property>
+<property type="boolean" id="isrow" mode="w" >
+True
+</property>
+</object>
+<object id='utilization.ram' module='Products.ZenModel.RRDDataPoint' class='RRDDataPoint'>
+<property select_variable="rrdtypes" type="selection" id="rrdtype" mode="w" >
+GAUGE
+</property>
+<property type="boolean" id="isrow" mode="w" >
+True
+</property>
+</object>
+<object id='utilization.ramswap' module='Products.ZenModel.RRDDataPoint' class='RRDDataPoint'>
 <property select_variable="rrdtypes" type="selection" id="rrdtype" mode="w" >
 GAUGE
 </property>
@@ -981,10 +997,52 @@ True
 </property>
 </object>
 </tomanycont>
+</object>
+</tomanycont>
+<tomanycont id='thresholds'>
+<object id='High RAM and Swap Utilization' module='Products.ZenModel.MinMaxThreshold' class='MinMaxThreshold'>
+<property label="DataPoints" type="lines" id="dsnames" mode="w" >
+['openvz_util_utilization.ramswap']
+</property>
+<property label="Enabled" type="boolean" id="enabled" mode="w" >
+True
+</property>
+<property type="string" id="maxval" mode="w" >
+here.hw.totalMemory + (0.5 * here.os.totalSwap) / (here.hw.totalMemory + here.os.totalSwap)
+</property>
+<property type="string" id="eventClass" mode="w" >
+/Status
+</property>
+<property type="int" id="severity" mode="w" >
+3
+</property>
+<property type="int" id="escalateCount" mode="w" >
+0
+</property>
+</object>
+<object id='Very High RAM and Swap Utilization' module='Products.ZenModel.MinMaxThreshold' class='MinMaxThreshold'>
+<property label="DataPoints" type="lines" id="dsnames" mode="w" >
+['openvz_util_utilization.ramswap']
+</property>
+<property label="Enabled" type="boolean" id="enabled" mode="w" >
+True
+</property>
+<property type="string" id="maxval" mode="w" >
+here.hw.totalMemory + (0.75 * here.os.totalSwap) / (here.hw.totalMemory + here.os.totalSwap)
+</property>
+<property type="string" id="eventClass" mode="w" >
+/Status
+</property>
+<property type="int" id="severity" mode="w" >
+4
+</property>
+<property type="int" id="escalateCount" mode="w" >
+0
+</property>
 </object>
 </tomanycont>
 <tomanycont id='graphDefs'>
-<object id='container physbytes' module='Products.ZenModel.GraphDefinition' class='GraphDefinition'>
+<object id='OpenVZ Container Memory Utilization' module='Products.ZenModel.GraphDefinition' class='GraphDefinition'>
 <property type="int" id="height" mode="w" >
 100
 </property>
@@ -1007,10 +1065,10 @@ False
 True
 </property>
 <property type="long" id="sequence" mode="w" >
-1
+0
 </property>
 <tomanycont id='graphPoints'>
-<object id='util_physbytes.containers' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
+<object id='RAM and Swap Allocation (soft)' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
 <property type="long" id="sequence" mode="w" >
 0
 </property>
@@ -1024,7 +1082,7 @@ LINE
 False
 </property>
 <property type="string" id="format" mode="w" >
-%5.2lf%s
+%5.4lf%s
 </property>
 <property type="string" id="legend" mode="w" >
 ${graphPoint/id}
@@ -1033,43 +1091,15 @@ ${graphPoint/id}
 -1
 </property>
 <property type="string" id="dpName" mode="w" >
-openvz_util_physbytes.containers
+openvz_util_utilization.allocated
 </property>
 <property type="string" id="cFunc" mode="w" >
 AVERAGE
 </property>
 </object>
-</tomanycont>
-</object>
-<object id='container physpages' module='Products.ZenModel.GraphDefinition' class='GraphDefinition'>
-<property type="int" id="height" mode="w" >
-100
-</property>
-<property type="int" id="width" mode="w" >
-500
-</property>
-<property type="boolean" id="log" mode="w" >
-False
-</property>
-<property type="boolean" id="base" mode="w" >
-False
-</property>
-<property type="int" id="miny" mode="w" >
--1
-</property>
-<property type="int" id="maxy" mode="w" >
--1
-</property>
-<property type="boolean" id="hasSummary" mode="w" >
-True
-</property>
+<object id='RAM and Swap Utilization' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
 <property type="long" id="sequence" mode="w" >
-0
-</property>
-<tomanycont id='graphPoints'>
-<object id='util_physpages.containers' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
-<property type="long" id="sequence" mode="w" >
-0
+1
 </property>
 <property select_variable="lineTypes" type="selection" id="lineType" mode="w" >
 LINE
@@ -1081,7 +1111,7 @@ LINE
 False
 </property>
 <property type="string" id="format" mode="w" >
-%5.2lf%s
+%5.4lf%s
 </property>
 <property type="string" id="legend" mode="w" >
 ${graphPoint/id}
@@ -1090,7 +1120,7 @@ ${graphPoint/id}
 -1
 </property>
 <property type="string" id="dpName" mode="w" >
-openvz_util_physpages.containers
+openvz_util_utilization.ramswap
 </property>
 <property type="string" id="cFunc" mode="w" >
 AVERAGE

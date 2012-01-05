@@ -56,13 +56,15 @@ class OpenVZ(CommandPlugin):
         if lines[0] != "yes":
             # we are not in a container or on a host
             return []   
+        pos = 1
         try:
-            page_size = int(lines[1])
+            page_size = int(lines[pos])
         except ValueError:
             page_size = 4096
-        arch = lines[2]
-        hostmap = ObjectMap({"page_size" : page_size, "arch" : arch}, compname="hw")
-        pos = 3 
+        pos += 1
+        arch = lines[pos]
+        pos += 1
+        hostmap = ObjectMap({"page_size" : page_size, "arch" : arch }, compname="hw")
         infolines = []
         while lines[pos] != "#veinfo-stop":
                 infolines.append(lines[pos])
