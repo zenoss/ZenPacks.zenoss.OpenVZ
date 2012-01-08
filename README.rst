@@ -98,8 +98,8 @@ OpenVZ deployment.
 Container Metrics and Graphs
 ----------------------------
 
-**Note: These settings can be viewed by navigating to *Advanced*, *Monitoring
-Templates*, *OpenVZContainer*, */Server* in the UI.**
+.. Note:: These settings can be viewed by navigating to ``Advanced``, ``Monitoring
+ Templates``, ``OpenVZContainer``, ``/Server`` in the UI.
 
 By default, each Container component on an OpenVZ host has three graphs showing
 number of processes, open files and memory utilization of each container. These
@@ -137,6 +137,13 @@ These Data Points should be created as type of GAUGE with the appropriate name.
 The monitoring template will correlate the beancounter name with the metric
 name and populate it with data.
 
+.. Note:: OpenVZ allows individual resource limits to be disabled by setting
+ the ``barrier`` and/or ``limit`` value to ``LONG_MAX`` (typically
+ 9223372036854775807 on 64-bit systems. The OpenVZ monitoring template will
+ detect ``LONG_MAX`` when it is set and will *not* write this data out to
+ RRD, as it indicates "Unlimited" rather than a valid numerical value. This
+ will result in NaN data for "Unlimited" ``barrier`` and ``limit`` values.
+
 In addition, the OpenVZ ZenPack implements a number of enhanced capabilities
 regarding Data Points:
 
@@ -153,8 +160,8 @@ regarding Data Points:
 Host Metrics and Graphs
 -----------------------
 
-**Note: These settings can be viewed by navigating to *Advanced*, *Monitoring
-Templates*, *OpenVZHost*, */Server* in the UI.**
+.. Note:: These settings can be viewed by navigating to ``Advanced``, ``Monitoring
+ Templates``, ``OpenVZHost``, ``/Server`` in the UI.
 
 OpenVZ hosts have two Data Sources: ``openvz`` and ``openvz_util``. ``openvz``
 is used for collecting container status and firing events on container status
@@ -203,11 +210,11 @@ This graph can be used to optimize the capacity of your OpenVZ hosts. In general
 you want to maximize memory utilization without hitting too high a value for "RAM
 and Swap Used".
 
-Note that OpenVZ also has commitment level formulas. These have not yet been
-integrated into the OpenVZ ZenPack at this time, but will be in the future. For
-commitment levels to work correctly, all containers on the host must have
-active memory resource limits. However, the metrics described above are available
-for all OpenVZ hosts, whether memory resource limits are active or not.
+.. Note:: OpenVZ also has commitment level formulas. These have not yet been
+ integrated into the OpenVZ ZenPack at this time, but will be in the future. For
+ commitment levels to work correctly, all containers on the host must have
+ active memory resource limits. However, the metrics described above are available
+ for all OpenVZ hosts, whether memory resource limits are active or not.
 
 TODO
 ----
