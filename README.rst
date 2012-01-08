@@ -5,7 +5,7 @@ ZenPacks.zenoss.OpenVZ
 .. contents::
     :depth: 3
 
-This project is a Zenoss_ extension (ZenPack) that provides specialized
+This project is a Zenoss extension (ZenPack) that provides specialized
 modeling and monitoring capabilities for `OpenVZ` hosts.
 
 While Zenoss always has had the ability to monitor an OpenVZ host system and
@@ -95,4 +95,133 @@ Graphs for the host Device) which will allow you to actively monitor the
 memory utilization of the containers and thus optimize the capacity of your
 OpenVZ deployment.
 
+Container Metrics and Graphs
+----------------------------
 
+**Note: These settings can be viewed by navigating to *Advanced*, *Monitoring
+Templates*, *OpenVZContainer*, */Server* in the UI.**
+
+By default, each Container component on an OpenVZ host has three graphs showing
+number of processes, open files and memory utilization of each container. These
+graphs are based on data extracted from ``/proc/user_beancounters`` on the
+OpenVZ host.
+
+This ZenPack has been written to allow you to monitor the full content of 
+``/proc/user_beancounters``, but because of the large number of potential Data
+Points, only a handful of Data Points have been enabled by default in order
+to allow the default graphs to be displayed:
+
+* ``numfile``
+* ``numfile.maxheld``
+* ``numproc``
+* ``numproc.maxheld``
+* ``oomguarbytes``
+* ``oomguarbytes.maxheld``
+* ``privvmbytes``
+* ``privvmbytes.maxheld``
+
+Additional Data Points can be added to the ``openvz`` datasource. All you need
+to do is name the Data Point according to the naming convention described here,
+and the OpenVZ ZenPack will populate the Data Point with RRD data.
+
+The name of the Data Point should be of the following format:
+
+* ``[resource]``
+* ``[resource].maxheld``
+* ``[resource].barrier``
+* ``[resource].limit``
+* ``[resource].failcnt``
+
+Any resource name that is visible in ``/proc/user_beancounters`` can be used.
+These Data Points should be created as type of GAUGE with the appropriate name.
+The monitoring template will correlate the beancounter name with the metric
+name and populate it with data.
+
+In addition, the OpenVZ ZenPack implements a number of enhanced capabilities
+regarding Data Points:
+
+* For every data point ending in "pages", there is a
+corresponding Data Point ending in "bytes" that has been normalized from memory
+pages to bytes. This is used for the datapoint ``openvz.oomguarbytes`` to get a
+byte-normalized value of ``oomguarpages`` from ``/proc/user_beancounters``, for
+example.
+
+* There is an additional ``.failrate`` suffix that can be created as a 
+DERIVED RRD Type with a minimum value of 0 and used for firing events when the
+value increments.
+
+Host Metrics and Graphs
+-----------------------
+
+**Note: These settings can be viewed by navigating to *Advanced*, *Monitoring
+Templates*, *OpenVZHost*, */Server* in the UI.**
+
+OpenVZ hosts have two Data Sources: ``openvz`` and ``openvz_util``. ``openvz``
+is used for collecting container status and firing events on container status
+change. It is not intended to be changed at all. 
+
+The ``openvz_util`` Data Source is used for monitoring host utilization and can
+be modified by the user. It works similarly to the Container's ``openvz`` Data
+Source in that a sampling of Data Points have been added by default, but more
+can be added by the end user for metrics of interest. The Data Point names that
+are recognized are:
+
+* ``containers.[resource]``
+* ``host.[resource]``
+* ``utilization.ram``
+* ``utilization.ramswap``
+* ``utilization.allocated``
+
+``containers.[resource]`` and ``host.[resource]`` Data Points can be created,
+where ``[resource]`` is any resource name listed in
+``/proc/user_beancounters``. Any resource name beginning with ``containers.``
+will contain the total current value of that resource for all containers on the
+system. For example, ``containers.oomguarpages`` will contain the sum of all
+``oomguarpages`` for all containers on the host. The ``host.[resource]`` prefix
+can be used to extract the current value of the corresponding resource for the
+host, that is, VEID 0.
+
+OpenVZ Container Memory Utilization Graph
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A very useful graph has been defined for the OpenVZ host, called "OpenVZ 
+Container Memory Utilization." Using data from ``/proc/user_beancounters``,
+a number of key metrics related to the memory utilization of all containers
+on the host are calculated and presented in percentage form, based on the
+formulas described here: http://wiki.openvz.org/UBC_systemwide_configuration
+
+* RAM and Swap Allocated - how much RAM and Swap has been allocated (but may
+  not yet be used). This value can exceed 1.0 (100% in the graph.)
+
+* RAM and Swap Used - how much RAM and Swap has actually been used. Thresholds
+  are defined for high values.
+
+* RAM Used - how much RAM has been used. Values from 0.8 to 1.0 (80% to 100%
+  in the graph) are acceptable.
+
+This graph can be used to optimize the capacity of your OpenVZ hosts. In general,
+you want to maximize memory utilization without hitting too high a value for "RAM
+and Swap Used".
+
+Note that OpenVZ also has commitment level formulas. These have not yet been
+integrated into the OpenVZ ZenPack at this time, but will be in the future. For
+commitment levels to work correctly, all containers on the host must have
+active memory resource limits. However, the metrics described above are available
+for all OpenVZ hosts, whether memory resource limits are active or not.
+
+TODO
+----
+
+Future plans for development of this ZenPack include:
+
+* General: Reduce or eliminate need for manual addition of Modeler Plugins. 
+* OpenVZ Host: Integrate Commitment Level Formulas
+* OpenVZ Containers: collect ``/proc/vz/vestat`` (uptime and load data) for each container
+* OpenVZ Host: force remodel of device on new container or container destroyed event
+* OpenVZ Host: provide cumulative ``failcnt`` and ``failrate`` Data Points for host-wide failcnt eventing
+* Add tests!
+
+To submit new feature requests, bug reports, and submit improvements, visit the OpenVZ
+ZenPack on GitHub:
+
+https://github.com/zenoss/ZenPacks.zenoss.OpenVZ
