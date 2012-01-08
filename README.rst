@@ -141,14 +141,14 @@ In addition, the OpenVZ ZenPack implements a number of enhanced capabilities
 regarding Data Points:
 
 * For every data point ending in "pages", there is a
-corresponding Data Point ending in "bytes" that has been normalized from memory
-pages to bytes. This is used for the datapoint ``openvz.oomguarbytes`` to get a
-byte-normalized value of ``oomguarpages`` from ``/proc/user_beancounters``, for
-example.
+  corresponding Data Point ending in "bytes" that has been normalized from memory
+  pages to bytes. This is used for the datapoint ``openvz.oomguarbytes`` to get a
+  byte-normalized value of ``oomguarpages`` from ``/proc/user_beancounters``, for
+  example.
 
 * There is an additional ``.failrate`` suffix that can be created as a 
-DERIVED RRD Type with a minimum value of 0 and used for firing events when the
-value increments.
+  DERIVED RRD Type with a minimum value of 0 and used for firing events when the
+  value increments.
 
 Host Metrics and Graphs
 -----------------------
