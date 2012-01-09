@@ -104,23 +104,23 @@ class OpenVZ(CommandPlugin):
                 om.onboot = False
                 if lines[pos] in vzinfo:
                     om.container_status = vzinfo[lines[pos]]
-                if om.container_status == "running":
-                    om.ipaddrs = []
-                    # only update IPs if running so the IPs stick around if the container is stopped during remodel,
-                    # so we still have IPs for container component <-> managed device correlation :)
-                    for ip in lines[pos+4].split():
-                        om.ipaddrs.append(ip)
-                    # again, only update MAC addresses from veth when we are in a running state, so we cache old
-                    # ones for correlation if a container happens to be stopped...
-                    om.macaddrs = []
-                    for netif in lines[pos+5].split(";"):
-                        keypairs = netif.split(",")
-                        for kp in keypairs:
-                            kv = kp.split("=")
-                            if len(kv) != 2:
-                                continue
-                            if kv[0] == "mac":
-                                om.macaddrs.append(kv[1].lower())
+                    if om.container_status == "running":
+                        om.ipaddrs = []
+                        # only update IPs if running so the IPs stick around if the container is stopped during remodel,
+                        # so we still have IPs for container component <-> managed device correlation :)
+                        for ip in lines[pos+4].split():
+                            om.ipaddrs.append(ip)
+                        # again, only update MAC addresses from veth when we are in a running state, so we cache old
+                        # ones for correlation if a container happens to be stopped...
+                        om.macaddrs = []
+                        for netif in lines[pos+5].split(";"):
+                            keypairs = netif.split(",")
+                            for kp in keypairs:
+                                kv = kp.split("=")
+                                if len(kv) != 2:
+                                    continue
+                                if kv[0] == "mac":
+                                    om.macaddrs.append(kv[1].lower())
                 if lines[pos+9] == "yes":
                     om.onboot = True
             pos += 11 

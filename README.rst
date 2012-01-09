@@ -226,6 +226,8 @@ Future plans for development of this ZenPack include:
 * OpenVZ Containers: collect ``/proc/vz/vestat`` (uptime and load data) for each container
 * OpenVZ Host: force remodel of device on new container or container destroyed event
 * OpenVZ Host: provide cumulative ``failcnt`` and ``failrate`` Data Points for host-wide failcnt eventing
+* Container detection could be a bit more sophisticated. a stray ``vzctl`` command with a non-existent VEID
+  will create a config file, yet it does not exist, and vzlist does not display it. Yet we list it.
 * Add tests!
 
 To submit new feature requests, bug reports, and submit improvements, visit the OpenVZ
