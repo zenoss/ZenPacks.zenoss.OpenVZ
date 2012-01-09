@@ -228,6 +228,12 @@ Future plans for development of this ZenPack include:
 * OpenVZ Host: provide cumulative ``failcnt`` and ``failrate`` Data Points for host-wide failcnt eventing
 * Container detection could be a bit more sophisticated. a stray ``vzctl`` command with a non-existent VEID
   will create a config file, yet it does not exist, and vzlist does not display it. Yet we list it.
+* Right now, enabling this ZenPack for a server is a two-step process -- first, add the Modeler Plugin.
+  Then, add the OpenVZHost monitoring template. It would be nice if this could be changed to a 1-step
+  process, where OpenVZHost is auto-added as a monitoring template. This would mean we would be guaranteed
+  that some monitoring is running after someone configures the OpenVZ ZenPack. Right now, they could forget
+  to enable OpenVZHost and then miss out on container created/destroyed eventing. And if I know OpenVZHost
+  is enabled, I can use this to fire off events related to configuration problems so they show up in the UI.
 * Add tests!
 
 To submit new feature requests, bug reports, and submit improvements, visit the OpenVZ
