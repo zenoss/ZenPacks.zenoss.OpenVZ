@@ -64,7 +64,7 @@ class OpenVZ(CommandPlugin):
         pos += 1
         arch = lines[pos]
         pos += 1
-        hostmap = ObjectMap({"page_size" : page_size, "arch" : arch }, compname="hw")
+        hw_map = ObjectMap({"page_size" : page_size, "arch" : arch }, compname="hw")
         infolines = []
         while lines[pos] != "#veinfo-stop":
                 infolines.append(lines[pos])
@@ -141,4 +141,11 @@ class OpenVZ(CommandPlugin):
         # an objectmap - 
         # a list of relmaps, objectmaps
 
-        return [hostmap, rm]
+        # If we get here, we've identified this as an OpenVZ host. Create a new
+        # ObjectMap that will be applied to the device. Use it to call our
+        # setOpenVZHostTemplate method on the device to bind the host-level
+        # monitoring template.
+        device_map = ObjectMap()
+        device_map.setOpenVZHostTemplate = True
+
+        return [device_map, hw_map, rm]

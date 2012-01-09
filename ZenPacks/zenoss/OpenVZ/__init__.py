@@ -68,7 +68,29 @@ def openvz_getExpandedLinks(self):
         links = '<a href="%s">OpenVZ Container %s on Host %s</a><br/>' % (host.getPrimaryUrlPath(), host.titleOrId(), host.device().titleOrId()) + links
     return links
 Device.getExpandedLinks = openvz_getExpandedLinks
- 
+
+
+@monkeypatch('Products.ZenModel.Device.Device')
+def setOpenVZHostTemplate(self, enabled):
+    """Bind OpenVZHost monitoring template if enabled is true."""
+    templates = self.primaryAq().zDeviceTemplates
+
+    if enabled:
+        if 'OpenVZHost' not in templates:
+            templates.append('OpenVZHost')
+            self.setZenProperty('zDeviceTemplates', templates)
+    else:
+        if 'OpenVZHost' in templates:
+            templates.remove('OpenVZHost')
+            self.setZenProperty('zDeviceTemplates', templates)
+
+
+@monkeypatch('Products.ZenModel.Device.Device')
+def getOpenVZHostTemplate(self):
+    """Returns true if OpenVZHost monitoring template is bound."""
+    return 'OpenVZHost' in self.primaryAq().zDeviceTemplates
+
+
 class ZenPack(ZenPackBase):
     def install(self, app):
         ZenPackBase.install(self, app)
