@@ -27,6 +27,31 @@ that you are monitoring. For containers containing production workloads,
 this dual-monitoring approach allows you to use traditional Zenoss monitoring
 and alerting functions within the container.
 
+ChangeLog
+---------
+
+1.01 January 9, 2012
+~~~~~~~~~~~~~~~~~~~~
+
+* Initial code from Chet to auto-bind OpenVZHost Monitoring Template from the
+  Modeling Plugin. Not yet working. Very close.
+
+* Two new event transforms to force a remodel of the OpenVZ host when an
+  ``openvz_container_created`` or ``openvz_container_destroyed`` event is fired.
+  This will keep the OpenVZ Containers components list up-to-date within a
+  few minutes.
+
+* New Config Error Event when the host utilization command parser cannot
+  retrieve all necessary metrics from ``/proc/user_beancounters`` to calculate
+  OpenVZ Memory Utilization metrics.
+
+* Removed left-over example code.
+
+1.0 Release
+~~~~~~~~~~~
+
+Initial Release.
+
 Requirements and Dependencies
 -----------------------------
 
@@ -224,7 +249,6 @@ Future plans for development of this ZenPack include:
 * General: Reduce or eliminate need for manual addition of Modeler Plugins. 
 * OpenVZ Host: Integrate Commitment Level Formulas
 * OpenVZ Containers: collect ``/proc/vz/vestat`` (uptime and load data) for each container
-* OpenVZ Host: force remodel of device on new container or container destroyed event
 * OpenVZ Host: provide cumulative ``failcnt`` and ``failrate`` Data Points for host-wide failcnt eventing
 * Container detection could be a bit more sophisticated. a stray ``vzctl`` command with a non-existent VEID
   will create a config file, yet it does not exist, and vzlist does not display it. Yet we list it.

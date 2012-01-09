@@ -74,11 +74,19 @@ class host_util(CommandParser):
         # other stuff we need:
         otherbuf = [ "privvmpages", "oomguarpages", "kmemsize", "physpages" ]
 
-        ok = True
+        missing = []
         for key in sockbuf + otherbuf:
             if key not in metrics["containers"]:
-                ok = False
-        if ok:
+                missing.append(key)
+
+        if missing:
+                result.events.append(dict(
+                    summary="Unable to find metrics for OpenVZ Memory Utilization",
+                    message="These metrics were unable to be read from the host device's /proc/user_beancounters file: " + " ".join(missing),
+                    severity="4",
+                    eventClass="/Config",
+                ))
+        else:
             asb = 0
             for key in sockbuf:
                 asb += metrics["containers"][key] 

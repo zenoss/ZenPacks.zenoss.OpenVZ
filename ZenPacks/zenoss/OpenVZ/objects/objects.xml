@@ -711,6 +711,38 @@ AVERAGE
 </object>
 </tomanycont>
 </object>
+<!-- ('', 'zport', 'dmd', 'Events', 'Status', 'instances', 'openvz_container_created') -->
+<object id='/zport/dmd/Events/Status/instances/openvz_container_created' module='Products.ZenEvents.EventClassInst' class='EventClassInst'>
+<property type="text" id="transform" mode="w" >
+if device:
+    device.collectDevice(setlog=False, background=True)
+</property>
+<property type="string" id="eventClassKey" mode="w" >
+openvz_container_created
+</property>
+<property type="int" id="sequence" mode="w" >
+7
+</property>
+<property type="text" id="explanation" mode="w" >
+Remodel the device to grab new container components that have been created.
+</property>
+</object>
+<!-- ('', 'zport', 'dmd', 'Events', 'Status', 'instances', 'openvz_container_destroyed') -->
+<object id='/zport/dmd/Events/Status/instances/openvz_container_destroyed' module='Products.ZenEvents.EventClassInst' class='EventClassInst'>
+<property type="text" id="transform" mode="w" >
+if device:
+    device.collectDevice(setlog=False, background=True)
+</property>
+<property type="string" id="eventClassKey" mode="w" >
+openvz_container_destroyed
+</property>
+<property type="int" id="sequence" mode="w" >
+7
+</property>
+<property type="text" id="explanation" mode="w" >
+Remodel device to remove Container components from our model that have been destroyed.
+</property>
+</object>
 <!-- ('', 'zport', 'dmd', 'Events', 'Status', 'instances', 'openvz_container_status_change') -->
 <object id='/zport/dmd/Events/Status/instances/openvz_container_status_change' module='Products.ZenEvents.EventClassInst' class='EventClassInst'>
 <property type="text" id="transform" mode="w" >

@@ -74,7 +74,6 @@ Device.getExpandedLinks = openvz_getExpandedLinks
 def setOpenVZHostTemplate(self, enabled):
     """Bind OpenVZHost monitoring template if enabled is true."""
     templates = self.primaryAq().zDeviceTemplates
-
     if enabled:
         if 'OpenVZHost' not in templates:
             templates.append('OpenVZHost')
