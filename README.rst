@@ -73,9 +73,9 @@ Usage
 
 To ensure the OpenVZ host system is being monitored, ensure that the
 ``zenoss.cmd.linux.OpenVZ`` Modeler Plugin is enabled for the host system.
-Note that this will require Zenoss to be configured with the proper
+Note that this will require Zenoss to be configured with ``root`` 
 credentials to monitor the OpenVZ host via SSH, as all OpenVZ data is
-extracted over SSH rather than SNMP.
+extracted over SSH and ``root`` access is required to access this data.
 
 With the modeler plugin enabled, remodeling the device should cause OpenVZ
 Containers to be displayed as Components of the modeled device.  You should
