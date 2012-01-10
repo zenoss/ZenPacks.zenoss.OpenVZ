@@ -105,7 +105,7 @@ ZC.ContainerGridPanel = Ext.extend(ZC.OpenVZStackComponentGridPanel, {
                 dataIndex: 'hostname',
                 header: _t('Hostname'),
                 sortable: true,
-                width: 60
+                width: 80
             },{
                 id: 'ipaddrs',
                 dataIndex: 'ipaddrs',
@@ -115,7 +115,7 @@ ZC.ContainerGridPanel = Ext.extend(ZC.OpenVZStackComponentGridPanel, {
                     if (obj)
                         return obj.join(" ");
                 },
-                width: 80
+                width: 100
             },{
                 id: 'managed_device',
                 dataIndex: 'managed_device',
