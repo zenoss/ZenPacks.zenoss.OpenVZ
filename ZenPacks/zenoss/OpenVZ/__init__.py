@@ -73,7 +73,7 @@ Device.getExpandedLinks = openvz_getExpandedLinks
 @monkeypatch('Products.ZenModel.Device.Device')
 def setOpenVZHostTemplate(self, enabled):
     """Bind OpenVZHost monitoring template if enabled is true."""
-    templates = self.primaryAq().zDeviceTemplates
+    templates = list(self.primaryAq().zDeviceTemplates)
     if enabled:
         if 'OpenVZHost' not in templates:
             templates.append('OpenVZHost')
