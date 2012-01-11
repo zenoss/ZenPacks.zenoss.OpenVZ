@@ -18,8 +18,8 @@ from Products.Zuul.interfaces import ICatalogTool
 
 unused(Globals)
 
-# Add relations to the base device class. This is the best method for adding capabilities to an existing
-# Linux system. 
+# Add relations to the base device class. This is the best method for adding
+# capabilities to an existing Linux system.
 Device._relations += (('openvz_containers', ToManyCont(ToOne,
     'ZenPacks.zenoss.OpenVZ.Container.Container', 'host')), )
 
@@ -28,11 +28,16 @@ Device._relations += (('openvz_containers', ToManyCont(ToOne,
 
 if not hasattr(DeviceHW, 'page_size'):
     DeviceHW.page_size = 4096
-    DeviceHW._properties += ({ 'id' : 'pagesize', 'type': 'int', 'mode': 'w'},)
+    DeviceHW._properties += (
+        {'id': 'pagesize', 'type': 'int', 'mode': 'w'},
+        )
 
 if not hasattr(DeviceHW, 'arch'):
     DeviceHW.arch = "x86_64"
-    DeviceHW._properties += ({ 'id' : 'arch', 'type' : 'string', 'mode': 'w'},)
+    DeviceHW._properties += (
+        {'id': 'arch', 'type': 'string', 'mode': 'w'},
+        )
+
 
 @monkeypatch("Products.ZenModel.Device.Device")
 def getOpenVZComponentOnHost(self):
@@ -51,7 +56,7 @@ def getOpenVZComponentOnHost(self):
                 # for each IP address on our interface:
                 for our_ip in iface.getIpAddresses():
                     if c_ip == our_ip.split("/")[0]:
-                        return c        
+                        return c
         for c_mac in c.macaddrs:
             for iface in self.os.interfaces():
                 our_mac = iface.getInterfaceMacaddress().lower()
@@ -59,14 +64,18 @@ def getOpenVZComponentOnHost(self):
                     return c
     return
 
+
 # old-school monkeypatch
 foo = Device.getExpandedLinks
+
+
 def openvz_getExpandedLinks(self):
     links = foo(self)
     host = self.getOpenVZComponentOnHost()
     if host:
         links = '<a href="%s">OpenVZ Container %s on Host %s</a><br/>' % (host.getPrimaryUrlPath(), host.titleOrId(), host.device().titleOrId()) + links
     return links
+
 Device.getExpandedLinks = openvz_getExpandedLinks
 
 
