@@ -107,9 +107,14 @@ def getOpenVZHostTemplate(self):
 
 
 class ZenPack(ZenPackBase):
+    modeler_plugins = {
+        'zenoss.cmd.linux.OpenVZ': ('/Server/Linux', '/Server/SSH/Linux'),
+        }
+
     def install(self, app):
         ZenPackBase.install(self, app)
 
+        self.install_modeler_plugins(app.zport.dmd)
         self.rebuildRelations(app.zport.dmd)
 
     def remove(self, app, leaveObjects=False):
@@ -118,8 +123,45 @@ class ZenPack(ZenPackBase):
                 [x for x in Device._relations if x[0] != 'openvz_containers'])
 
             self.rebuildRelations(app.zport.dmd)
+            self.remove_modeler_plugins(app.zport.dmd)
 
         ZenPackBase.remove(self, app, leaveObjects=leaveObjects)
+
+    def install_modeler_plugins(self, dmd):
+        """Add modeler plugins to appropriate device classes."""
+        for plugin, dc_names in self.modeler_plugins.items():
+            for dc_name in dc_names:
+                dc = None
+                try:
+                    dc = dmd.Devices.getOrganizer(dc_name)
+                except KeyError:
+                    continue
+
+                plugins = list(dc.zCollectorPlugins)
+                if plugin not in plugins:
+                    log.info('Adding %s modeler plugin to %s',
+                        plugin, dc_name)
+
+                    plugins.append(plugin)
+                    dc.setZenProperty('zCollectorPlugins', plugins)
+
+    def remove_modeler_plugins(self, dmd):
+        """Remove our custom modeler plugins."""
+        for plugin, dc_names in self.modeler_plugins.items():
+            for dc_name in dc_names:
+                dc = None
+                try:
+                    dc = dmd.Devices.getOrganizer(dc_name)
+                except KeyError:
+                    continue
+
+                plugins = list(dc.zCollectorPlugins)
+                if plugin in plugins:
+                    log.info('Removing %s modeler plugin from %s',
+                        plugin, dc_name)
+
+                    plugins.remove(plugin)
+                    dc.setZenProperty('zCollectorPlugins', plugins)
 
     def rebuildRelations(self, dmd):
         for d in dmd.Devices.getSubDevicesGen():
