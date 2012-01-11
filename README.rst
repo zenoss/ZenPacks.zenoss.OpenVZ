@@ -33,6 +33,8 @@ ChangeLog
 1.0.2 January 10, 2012
 ~~~~~~~~~~~~~~~~~~~~~~
 
+* Documentation revision to reflect recent auto-configuration changes.
+
 * The `zenoss.cmd.linux.OpenVZ` modeler plugin will now automatically bind the
   `OpenVZHost` monitoring template to a device if a device is found to be an
   OpenVZ host. This eliminates a manual configuration step.
@@ -108,11 +110,31 @@ developer mode using the following commands::
 Usage
 -----
 
-To ensure the OpenVZ host system is being monitored, ensure that the
-``zenoss.cmd.linux.OpenVZ`` modeler plugin is enabled for the host system.
-Note that this will require Zenoss to be configured with ``root`` 
-credentials to monitor the OpenVZ host via SSH, as all OpenVZ data is
-extracted over SSH and ``root`` access is required to access this data.
+Post-Install Steps
+~~~~~~~~~~~~~~~~~~
+
+As of version 1.0.2, this ZenPack typically requires no manual post-install
+steps to enable for any OpenVZ host devices. All you need to do is to ensure
+that Zenoss has ``root`` SSH credentials for your OpenVZ host devices.
+
+Modeling OpenVZ Hosts
+~~~~~~~~~~~~~~~~~~~~~
+
+To see OpenVZ containers in Zenoss right away, simply add your OpenVZ hosts to
+Zenoss if you have not already. Once discovered or added, you should see
+``OpenVZ Containers`` menu under the device's ``Components`` list, in addition
+to a new ``OpenVZ Container Memory Utilization`` graph under the OpenVZ host
+device's ``Graphs`` page, at the bottom. 
+
+For any existing OpenVZ hosts that were added to Zenoss prior to ZenPack
+installation, choose ``Model Device...`` from the device's "gear" menu in the
+lower left of the detail screen to immediately remodel the device and display
+any OpenVZ containers that exist on the system.
+
+Again, note that Zenoss must be configured so that it has ``root`` access to
+the OpenVZ host, either by password or via RSA/DSA public key. ``root`` access
+is required to properly retrieve all OpenVZ-related information. This
+information is specified under the ``Configuration Properties`` page.
 
 With the modeler plugin enabled, remodeling the device should cause OpenVZ
 Containers to be displayed as Components of the modeled device.  You should
@@ -120,33 +142,82 @@ also see relevant information for each container on the system, such as its
 VEID, name, hostname, IP Address(es) (if assigned via venet), a link to the
 device (if you are monitoring the container directly via SSH or SNMP), the OS
 Template that was used to create the VE, the status of the "On Boot" flag and
-its status (running, stopped, etc.)
+its status (running, stopped, etc.) In addition, you should see an ``OpenVZ
+Container Memory Utilization`` graph on the OpenVZ host device's ``Graphs``
+page.
 
-To enable advanced functionality, it is recommended that you bind the
-``/Server/OpenVZHost`` monitoring template to the OpenVZ host as well.  This
-can be done by selecting ``Bind Templates`` under the Gear menu for the
-device. When this is done, you will be able to receive Events when containers
-are created, destroyed, started and stopped, and you will also be able to see
-a global ``OpenVZ Container Memory Utilization`` graph on the device (under
-Graphs for the host Device) which will allow you to actively monitor the
-memory utilization of the containers and thus optimize the capacity of your
-OpenVZ deployment.
+Behind the Scenes
+~~~~~~~~~~~~~~~~~
+
+As mentioned earlier, typically no post-install steps are required to actually
+enable the OpenVZ ZenPack other than installing it and adding OpenVZ hosts or
+remodeling any existing OpenVZ hosts already in Zenoss. However, if you have a
+highly customized Zenoss install, it is possible that some manual steps still
+may be required to get the OpenVZ ZenPack up and running. This section
+describes what the OpenVZ ZenPack does "behind the scenes" to automaticaly
+enable itself, so that you can perform these steps manually if necessary, and
+also validate that the OpenVZ ZenPack is fully functional in your environment.
+
+When the OpenVZ ZenPack is installed, it will automatically add the
+``zenoss.cmd.linux.OpenVZ`` modeler plugin to the device classes
+``/Server/Linux`` and ``/Server/SSH/Linux``. The modeler plugin is the heart of
+the OpenVZ ZenPack, and is what connects to your Linux system and determines if
+OpenVZ is running, and if so will model the containers on the system as
+components which appear under the ``OpenVZ Containers`` components list. If for
+some reason you are using different device classes for Linux devices than those
+for which the OpenVZ ZenPack automatically is enabled, you will need to
+manually add ``zenoss.cmd.linux.OpenVZ`` as one of the modeler plugins for the
+device classes you are using.
+
+Once the ``zenoss.cmd.linux.OpenVZ`` modeling plugin is enabled, it will
+connect to OpenVZ host devices and determine if they in fact have OpenVZ
+enabled.  If OpenVZ is detected, the modeling plugin will automatically bind
+the ``OpenVZHost`` monitoring template to the OpenVZ Host device. In addition,
+each container detected on the device will automatically have the
+``OpenVZContainer`` monitoring template bound to it. These monitoring templates
+run once every few minutes to collect new RRD metrics and utilization
+information. You will see charts under each Container listed under ``OpenVZ
+Containers``, and as you might guess these metrics are collected by the
+``OpenVZContainer`` monitoring template. In addition, you will see a new graph
+called ``OpenVZ Container Memory Utilization`` under the OpenVZ host device's
+``Graph`` list, and RRD data for this graph is collected/calculated by the
+``OpenVZHost`` monitoring template. The ``OpenVZHost`` monitoring template will
+also fire events when a new container is created, a container is destroyed, or
+there is another type of status change for a container such as it being
+started, stopped or suspended.
+
+Please ensure that all the provided functionality in the OpenVZ ZenPack is
+being enabled. If not, you should now know where to look for troubleshooting
+purposes.  If you get stuck, you may have encountered a bug of some kind, so
+file an Issue at https://github.com/zenoss/ZenPacks.zenoss.OpenVZ with detailed
+information about the problem you are experiencing.
 
 Container Metrics and Graphs
 ----------------------------
 
+The ``OpenVZContainer`` monitoring template collects data for each container
+and uses this data to populate data points in its ``openvz`` data source with
+new metrics every few minutes. 
+
 .. Note:: These settings can be viewed by navigating to ``Advanced``, ``Monitoring
  Templates``, ``OpenVZContainer``, ``/Server`` in the UI.
 
-By default, each Container component on an OpenVZ host has three graphs showing
-number of processes, open files and memory utilization of each container. These
-graphs are based on data extracted from ``/proc/user_beancounters`` on the
-OpenVZ host.
+By default, the ``OpenVZContainer`` monitoring template defines three graphs
+that will appear for each Container component on an OpenVZ host:
 
-This ZenPack has been written to allow you to monitor the full content of 
+* number of processes
+* open files
+* memory utilization
+
+These graphs are generated using data extracted from
+``/proc/user_beancounters`` on the OpenVZ host.
+
+The ``openvz`` datasource is designed so that additional graphs and data points
+can be added to monitor additional OpenVZ-supplied metrics.  This ZenPack has
+been written to allow you to monitor the full content of
 ``/proc/user_beancounters``, but because of the large number of potential Data
-Points, only a handful of Data Points have been enabled by default in order
-to allow the default graphs to be displayed:
+Points, only a handful of Data Points have been enabled by default in order to
+allow the default graphs to be displayed:
 
 * ``numfile``
 * ``numfile.maxheld``
@@ -200,14 +271,14 @@ Host Metrics and Graphs
 .. Note:: These settings can be viewed by navigating to ``Advanced``, ``Monitoring
  Templates``, ``OpenVZHost``, ``/Server`` in the UI.
 
-OpenVZ hosts have two Data Sources: ``openvz`` and ``openvz_util``. ``openvz``
-is used for collecting container status and firing events on container status
-change. It is not intended to be changed at all. 
+The ``OpenVZHost`` monitoring template has two data sources: ``openvz`` and
+``openvz_util``. ``openvz`` is used for collecting container status and firing
+events on container status change. It is not intended to be changed.
 
-The ``openvz_util`` Data Source is used for monitoring host utilization and can
+The ``openvz_util`` data source is used for monitoring host utilization and can
 be modified by the user. It works similarly to the Container's ``openvz`` Data
-Source in that a sampling of Data Points have been added by default, but more
-can be added by the end user for metrics of interest. The Data Point names that
+Source in that a sampling of data points have been added by default, but more
+can be added by the end user for metrics of interest. The data point names that
 are recognized are:
 
 * ``containers.[resource]``
@@ -216,7 +287,7 @@ are recognized are:
 * ``utilization.ramswap``
 * ``utilization.allocated``
 
-``containers.[resource]`` and ``host.[resource]`` Data Points can be created,
+``containers.[resource]`` and ``host.[resource]`` data points can be created,
 where ``[resource]`` is any resource name listed in
 ``/proc/user_beancounters``. Any resource name beginning with ``containers.``
 will contain the total current value of that resource for all containers on the
@@ -232,7 +303,7 @@ A very useful graph has been defined for the OpenVZ host, called "OpenVZ
 Container Memory Utilization." Using data from ``/proc/user_beancounters``,
 a number of key metrics related to the memory utilization of all containers
 on the host are calculated and presented in percentage form, based on the
-formulas described here: http://wiki.openvz.org/UBC_systemwide_configuration
+formulas described here: http://wiki.openvz.org/UBC_systemwide_configuration .
 
 * RAM and Swap Allocated - how much RAM and Swap has been allocated (but may
   not yet be used). This value can exceed 1.0 (100% in the graph.)
@@ -260,6 +331,7 @@ Future plans for development of this ZenPack include:
 
 * OpenVZ Host: Integrate Commitment Level Formulas
 * OpenVZ Containers: collect ``/proc/vz/vestat`` (uptime and load data) for each container
+* OpenVZ Containers: collect quota information
 * OpenVZ Host: provide cumulative ``failcnt`` and ``failrate`` Data Points for host-wide failcnt eventing
 * Container detection could be a bit more sophisticated. a stray ``vzctl`` command with a non-existent VEID
   will create a config file, yet it does not exist, and vzlist does not display it. Yet we list it.
@@ -267,5 +339,5 @@ Future plans for development of this ZenPack include:
 
 To submit new feature requests, bug reports, and submit improvements, visit the
 OpenVZ ZenPack on GitHub:
-
 https://github.com/zenoss/ZenPacks.zenoss.OpenVZ
+
