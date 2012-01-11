@@ -30,8 +30,19 @@ and alerting functions within the container.
 ChangeLog
 ---------
 
-1.01 January 9, 2012
-~~~~~~~~~~~~~~~~~~~~
+1.0.2 January 10, 2012
+~~~~~~~~~~~~~~~~~~~~~~
+
+* The `zenoss.cmd.linux.OpenVZ` modeler plugin will now automatically bind the
+  `OpenVZHost` monitoring template to a device if a device is found to be an
+  OpenVZ host. This eliminates a manual configuration step.
+
+* The ZenPack installer will now automatically add the `zenoss.cmd.linux.OpenVZ`
+  modeler plugin to the `/Server/Linux` and `/Server/SSH/Linux` device classes
+  if they exist. This eliminates a manual configuration step.
+
+1.0.1 January 9, 2012
+~~~~~~~~~~~~~~~~~~~~~
 
 * Initial code from Chet to auto-bind OpenVZHost Monitoring Template from the
   Modeling Plugin. Not yet working. Very close.
@@ -47,31 +58,32 @@ ChangeLog
 
 * Removed left-over example code.
 
-1.0 Release
-~~~~~~~~~~~
+1.0.0 Release
+~~~~~~~~~~~~~
 
 Initial Release.
 
 Requirements and Dependencies
 -----------------------------
 
-This ZenPack has been written to be compatible with Zenoss versions 3.2
-through 4.2+. So far, it has only been tested on Zenoss 4.1.2. If you 
-experience bugs with Zenoss 3.2, please file an issue against the package
-at https://github.com/zenoss/ZenPacks.zenoss.OpenVZ/issues . 
+This ZenPack has been written to be compatible with Zenoss versions 3.2 through
+4.1+. So far, it has only been tested up to Zenoss 4.1.1. If you experience
+bugs, please file an issue at
+https://github.com/zenoss/ZenPacks.zenoss.OpenVZ/issues.
 
 Installation
 ------------
 
-You must first have, or install, Zenoss 3.2.0 or later. Core and 
-Enterprise versions are supported. You can download the free Core version
-of Zenoss from http://community.zenoss.org/community/download .
+You must first have, or install, Zenoss 3.2.0 or later. Core and Enterprise
+versions are supported. You can download the free Core version of Zenoss from
+http://community.zenoss.org/community/download .
 
 Normal Installation (packaged egg)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To install ZenPacks, there is only one daemon that needs to be running:
-``zeneventserver``.
+To install ZenPacks, there is only one daemon that needs to be running. For
+Zenoss versions earlier than 4.0 this daemon is `zeoctl` for Zenoss 4.0 and
+later this daemon is `zeneventserver`.
 
 Best practice to install ZenPacks::
 
@@ -83,7 +95,7 @@ Best practice to install ZenPacks::
 For 3.x, use ``zeoctl`` instead of ``zeneventserver``.
 
 Developer Installation (link mode)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you wish to further develop and possibly contribute back to this ZenPack
 then you should clone the git repository and install the ZenPack in
@@ -97,7 +109,7 @@ Usage
 -----
 
 To ensure the OpenVZ host system is being monitored, ensure that the
-``zenoss.cmd.linux.OpenVZ`` Modeler Plugin is enabled for the host system.
+``zenoss.cmd.linux.OpenVZ`` modeler plugin is enabled for the host system.
 Note that this will require Zenoss to be configured with ``root`` 
 credentials to monitor the OpenVZ host via SSH, as all OpenVZ data is
 extracted over SSH and ``root`` access is required to access this data.
