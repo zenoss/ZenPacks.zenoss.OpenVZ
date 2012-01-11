@@ -1,6 +1,6 @@
 ##########################################################################
 #
-#   Copyright 2009, 2011 Zenoss, Inc. All Rights Reserved.
+#   Copyright 2011 Zenoss, Inc. All Rights Reserved.
 #
 ##########################################################################
 
@@ -23,8 +23,9 @@ unused(Globals)
 Device._relations += (('openvz_containers', ToManyCont(ToOne,
     'ZenPacks.zenoss.OpenVZ.Container.Container', 'host')), )
 
-# Add some new properties to device.hw, which we will use for recording the OS architecture as well as
-# pagesize. Set defaults and add only if they don't already exist:
+# Add some new properties to device.hw, which we will use for recording the OS
+# architecture as well as pagesize. Set defaults and add only if they don't
+# already exist:
 
 if not hasattr(DeviceHW, 'page_size'):
     DeviceHW.page_size = 4096
@@ -41,8 +42,9 @@ if not hasattr(DeviceHW, 'arch'):
 
 @monkeypatch("Products.ZenModel.Device.Device")
 def getOpenVZComponentOnHost(self):
-    # returns the component on the OpenVZ host, so we can link from an OpenVZ container
-    # that is managed (SNMP/SSH) to the container component on the host.
+    # returns the component on the OpenVZ host, so we can link from an OpenVZ
+    # container that is managed (SNMP/SSH) to the container component on the
+    # host.
     catalog = ICatalogTool(self.dmd)
     # for each Container ....
     for record in catalog.search('ZenPacks.zenoss.OpenVZ.Container.Container'):
@@ -73,7 +75,12 @@ def openvz_getExpandedLinks(self):
     links = foo(self)
     host = self.getOpenVZComponentOnHost()
     if host:
-        links = '<a href="%s">OpenVZ Container %s on Host %s</a><br/>' % (host.getPrimaryUrlPath(), host.titleOrId(), host.device().titleOrId()) + links
+        links = '<a href="%s">OpenVZ Container %s on Host %s</a><br/>%s' % (
+            host.getPrimaryUrlPath(),
+            host.titleOrId(),
+            host.device().titleOrId(),
+            links)
+
     return links
 
 Device.getExpandedLinks = openvz_getExpandedLinks
