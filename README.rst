@@ -239,7 +239,7 @@ with data:
 * ``vestat.user.jiffies`` - user CPU time in jiffies
 * ``vestat.system.jiffies``- system CPU time in jiffies
 * ``vestat.nice.jiffies``- user nice CPU time in jiffies
-* ``vestat.uptime.jiffies`` - container uptime in seconds
+* ``vestat.uptime.jiffies`` - container uptime in jiffies
 
 The "raw" form of the name, such as ``vestat.user``, is also supported, but it's
 recommended that you use the explicit ``.jiffies`` suffix above.
@@ -247,19 +247,19 @@ recommended that you use the explicit ``.jiffies`` suffix above.
 In addition, a variant of these data points are available, with the CPU time
 conveniently converted to seconds (1 second = 100 jiffies):
 
-* ``vestat.user.seconds``
-* ``vestat.system.seconds``
-* ``vestat.nice.seconds``
+* ``vestat.user.seconds`` (pre-defined)
+* ``vestat.system.seconds`` (pre-defined)
+* ``vestat.nice.seconds`` (pre-defined)
 * ``vestat.uptime.seconds``
 
-In addition, the following cycles-based counters are available:
+The following cycles-based counters are also available:
 
 * ``vestat.idle.cycles`` - idle CPU cycle count for container
 * ``vestat.uptime.cycles``- container uptime in CPU cycles
 * ``vestat.used.cycles``- CPU cycles used on all CPUs by container
 
-The OpenVZ ZenPack does not currently automatically convert CPU cycles to
-seconds, but this may be added in a future release.
+The OpenVZ ZenPack does not automatically convert CPU cycles to seconds, but
+this may be added in a future release.
 
 Beancounters
 ~~~~~~~~~~~~
