@@ -30,6 +30,11 @@ and alerting functions within the container.
 ChangeLog
 ---------
 
+1.1 January 19, 2012
+~~~~~~~~~~~~~~~~~~~~
+
+* Addition of ``/proc/vz/vestat`` monitoring for containers.
+
 1.0.2 January 10, 2012
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -202,22 +207,74 @@ new metrics every few minutes.
 .. Note:: These settings can be viewed by navigating to ``Advanced``, ``Monitoring
  Templates``, ``OpenVZContainer``, ``/Server`` in the UI.
 
-By default, the ``OpenVZContainer`` monitoring template defines three graphs
+By default, the ``OpenVZContainer`` monitoring template defines four graphs
 that will appear for each Container component on an OpenVZ host:
 
 * number of processes
 * open files
 * memory utilization
+* CPU utilization
 
-These graphs are generated using data extracted from
-``/proc/user_beancounters`` on the OpenVZ host.
+The first three graphs are generated using data extracted from
+``/proc/user_beancounters`` on the OpenVZ host. The CPU utilization graph is
+generated using ``/proc/vz/vestat`` information.
 
-The ``openvz`` datasource is designed so that additional graphs and data points
-can be added to monitor additional OpenVZ-supplied metrics.  This ZenPack has
-been written to allow you to monitor the full content of
-``/proc/user_beancounters``, but because of the large number of potential Data
-Points, only a handful of Data Points have been enabled by default in order to
-allow the default graphs to be displayed:
+vestat
+~~~~~~
+
+The ``openvz`` datasource has several data points pre-defined for you that are
+sourced from the ``/proc/vz/vestat`` file on the OpenVZ Host Device. These 
+data points will appear with the prefix ``openvz.`` in the Data Points list:
+
+* ``vestat.nice.seconds``
+* ``vestat.system.seconds``
+* ``vestat.user.seconds``
+
+The following datapoints can be defined by you (typically they would be set up
+as a GAUGE, though you could create a DERIVED if you wanted to see a delta)
+and if found, the ``OpenVZContainer`` monitoring template will populate them
+with data:
+
+* ``vestat.user.jiffies`` - user CPU time in jiffies
+* ``vestat.system.jiffies``- system CPU time in jiffies
+* ``vestat.nice.jiffies``- user nice CPU time in jiffies
+* ``vestat.uptime.jiffies`` - container uptime in seconds
+
+The "raw" form of the name, such as ``vestat.user``, is also supported, but it's
+recommended that you use the explicit ``.jiffies`` suffix above.
+
+In addition, a variant of these data points are available, with the CPU time
+conveniently converted to seconds (1 second = 100 jiffies):
+
+* ``vestat.user.seconds``
+* ``vestat.system.seconds``
+* ``vestat.nice.seconds``
+* ``vestat.uptime.seconds``
+
+In addition, the following cycles-based counters are available:
+
+* ``vestat.idle.cycles`` - idle CPU cycle count for container
+* ``vestat.uptime.cycles``- container uptime in CPU cycles
+* ``vestat.used.cycles``- CPU cycles used on all CPUs by container
+
+The OpenVZ ZenPack does not currently automatically convert CPU cycles to
+seconds, but this may be added in a future release.
+
+Beancounters
+~~~~~~~~~~~~
+
+The ``openvz`` datasource also pulls data from the OpenVZ host device's 
+``/proc/user_beancounters`` file. Like the vestat data points, this ZenPack
+includes some beancounters data points that are already defined for you,
+but additional ones you may be interested can also be defined and will
+be populated with data by the ``OpenVZContainer`` monitoring template
+if found.
+
+These data points will appear with the prefix ``openvz.`` in the Data Points
+list, but don't have an additional prefix like ``vestat.``. What this means
+that if a data point doesn't begin with ``openvz.vestat`` in the Data Points
+list, it is a beancounters data point. Here is a list of the data points
+that we have defined for you:
 
 * ``numfile``
 * ``numfile.maxheld``
@@ -228,9 +285,9 @@ allow the default graphs to be displayed:
 * ``privvmbytes``
 * ``privvmbytes.maxheld``
 
-Additional Data Points can be added to the ``openvz`` datasource. All you need
-to do is name the Data Point according to the naming convention described here,
-and the OpenVZ ZenPack will populate the Data Point with RRD data.
+Additional data points can be added to the ``openvz`` datasource. All you need
+to do is name the data point according to the naming convention described here,
+and the OpenVZ ZenPack will populate the data point with RRD data.
 
 The name of the Data Point should be of the following format:
 
@@ -241,9 +298,9 @@ The name of the Data Point should be of the following format:
 * ``[resource].failcnt``
 
 Any resource name that is visible in ``/proc/user_beancounters`` can be used.
-These Data Points should be created as type of GAUGE with the appropriate name.
-The monitoring template will correlate the beancounter name with the metric
-name and populate it with data.
+These Data Points should typically be created as type of GAUGE with the
+appropriate name.  The monitoring template will correlate the beancounter name
+with the metric name and populate it with data.
 
 .. Note:: OpenVZ allows individual resource limits to be disabled by setting
  the ``barrier`` and/or ``limit`` value to ``LONG_MAX`` (typically
@@ -330,8 +387,8 @@ TODO
 Future plans for development of this ZenPack include:
 
 * OpenVZ Host: Integrate Commitment Level Formulas
-* OpenVZ Containers: collect ``/proc/vz/vestat`` (uptime and load data) for each container
 * OpenVZ Containers: collect quota information
+* OpenVZ Containers: convert CPU cycles to seconds
 * OpenVZ Host: provide cumulative ``failcnt`` and ``failrate`` Data Points for host-wide failcnt eventing
 * Container detection could be a bit more sophisticated. a stray ``vzctl`` command with a non-existent VEID
   will create a config file, yet it does not exist, and vzlist does not display it. Yet we list it.
