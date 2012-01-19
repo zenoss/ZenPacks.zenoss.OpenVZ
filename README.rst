@@ -35,6 +35,8 @@ ChangeLog
 
 * Addition of ``/proc/vz/vestat`` monitoring for containers.
 
+* Successful testing with Zenoss 3.2.1.
+
 1.0.2 January 10, 2012
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -74,8 +76,7 @@ Requirements and Dependencies
 -----------------------------
 
 This ZenPack has been written to be compatible with Zenoss versions 3.2 through
-4.1+. So far, it has only been tested up to Zenoss 4.1.1. If you experience
-bugs, please file an issue at
+4.1+. If you find a bug or have a feature enhancement, please file an issue at
 https://github.com/zenoss/ZenPacks.zenoss.OpenVZ/issues.
 
 Installation
