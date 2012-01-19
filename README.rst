@@ -258,8 +258,8 @@ The following cycles-based counters are also available:
 * ``vestat.uptime.cycles``- container uptime in CPU cycles
 * ``vestat.used.cycles``- CPU cycles used on all CPUs by container
 
-The OpenVZ ZenPack does not automatically convert CPU cycles to seconds, but
-this may be added in a future release.
+The OpenVZ ZenPack does not provide ``.seconds`` equivalents for CPU cycles
+metrics. This may be added in a future release.
 
 Beancounters
 ~~~~~~~~~~~~
