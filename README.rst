@@ -324,10 +324,10 @@ appropriate name.  The monitoring template will correlate the beancounter name
 with the metric name and populate it with data.
 
 .. Note:: OpenVZ allows individual resource limits to be disabled by setting
- the ``barrier`` and/or ``limit`` value to ``LONG_MAX`` (typically
+ the ``barrier`` and/or ``limit`` value to ``LONG_MAX``, typically
  9223372036854775807 on 64-bit systems. The OpenVZ monitoring template will
  detect ``LONG_MAX`` when it is set and will *not* write this data out to
- RRD, as it indicates "Unlimited" rather than a valid numerical value. This
+ RRD, as it indicates "Unlimited" rather than a measured numerical value. This
  will result in NaN data for "Unlimited" ``barrier`` and ``limit`` values.
 
 In addition, the OpenVZ ZenPack implements a number of enhanced capabilities
