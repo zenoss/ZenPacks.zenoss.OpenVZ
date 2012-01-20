@@ -30,6 +30,8 @@ and alerting functions within the container.
 ChangeLog
 ---------
 
+* Adding screenshots to RST documentation.
+
 1.1 January 19, 2012
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -151,6 +153,24 @@ Template that was used to create the VE, the status of the "On Boot" flag and
 its status (running, stopped, etc.) In addition, you should see an ``OpenVZ
 Container Memory Utilization`` graph on the OpenVZ host device's ``Graphs``
 page.
+
+The OpenVZ host device's detail page should now look like this:
+
+|After Remodel|
+
+There will also be a new graph showing memory utilization of all containers
+on the system. This graph will be initially empty and will populate with data
+over the next hour:
+
+|OpenVZ Containers Memory Utilization|
+
+Clicking on a Container in the ``OpenVZ Containers`` list will display these
+pre-defined graphs:
+
+|Container Number of Processes|
+|Container Number of Open Files|
+|Container Memory Utilization|
+|Container CPU Utilization|
 
 Behind the Scenes
 ~~~~~~~~~~~~~~~~~
@@ -398,4 +418,11 @@ Future plans for development of this ZenPack include:
 To submit new feature requests, bug reports, and submit improvements, visit the
 OpenVZ ZenPack on GitHub:
 https://github.com/zenoss/ZenPacks.zenoss.OpenVZ
+
+.. |Container CPU Utilization| image:: https://github.com/zenoss/ZenPacks.zenoss.OpenVZ/raw/master/images/cpuutil.png
+.. |Container Memory Utilization| image:: https://github.com/zenoss/ZenPacks.zenoss.OpenVZ/raw/master/images/memutil-c.png
+.. |Container Number of Processes| image:: https://github.com/zenoss/ZenPacks.zenoss.OpenVZ/raw/master/images/numproc.png
+.. |Container Number of Open Files| image:: https://github.com/zenoss/ZenPacks.zenoss.OpenVZ/raw/master/images/openfiles.png
+.. |After Remodel| image:: https://github.com/zenoss/ZenPacks.zenoss.OpenVZ/raw/master/images/overview.png
+.. |OpenVZ Containers Memory Utilization| image:: https://github.com/zenoss/ZenPacks.zenoss.OpenVZ/raw/master/images/memutil.png
 
