@@ -865,8 +865,8 @@ AVERAGE
 <!-- ('', 'zport', 'dmd', 'Events', 'Status', 'instances', 'openvz_container_created') -->
 <object id='/zport/dmd/Events/Status/instances/openvz_container_created' module='Products.ZenEvents.EventClassInst' class='EventClassInst'>
 <property type="text" id="transform" mode="w" >
-if device:
-    device.collectDevice(setlog=False, background=True)
+from ZenPacks.zenoss.OpenVZ.transforms import remodel
+remodel(evt,device)
 </property>
 <property type="string" id="eventClassKey" mode="w" >
 openvz_container_created
@@ -881,8 +881,8 @@ Remodel the device to grab new container components that have been created.
 <!-- ('', 'zport', 'dmd', 'Events', 'Status', 'instances', 'openvz_container_destroyed') -->
 <object id='/zport/dmd/Events/Status/instances/openvz_container_destroyed' module='Products.ZenEvents.EventClassInst' class='EventClassInst'>
 <property type="text" id="transform" mode="w" >
-if device:
-    device.collectDevice(setlog=False, background=True)
+from ZenPacks.zenoss.OpenVZ.transforms import remodel
+remodel(evt,device)
 </property>
 <property type="string" id="eventClassKey" mode="w" >
 openvz_container_destroyed
