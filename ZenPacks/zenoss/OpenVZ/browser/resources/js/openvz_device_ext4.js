@@ -3,9 +3,7 @@ else can be debugged in the browser using a JavaScript console or similar. */
 
 (function(){
 
-var ZC = Ext.ns('Zenoss.component');
-
-ZC.registerName('OpenVZContainer', _t('OpenVZ Container'), _t('OpenVZ Containers'));
+Zenoss.component.registerName('OpenVZContainer', _t('OpenVZ Container'), _t('OpenVZ Containers'));
 
 Ext.apply(Zenoss.render, {
     entityLinkFromGrid: function(obj) { 
@@ -29,10 +27,9 @@ Ext.apply(Zenoss.render, {
     }
 });
 
-Ext.define('ZC.OpenVZStackComponentGridPanel',{
-    extend: 'ZC.ComponentGridPanel',
-    subComponentGridPanel: false,
-    
+Ext.define('Zenoss.component.OpenVZContainerPanel',{
+    extend: 'Zenoss.component.ComponentGridPanel',
+
     jumpToEntity: function(uid, name) {
         var tree = Ext.getCmp('deviceDetailNav').treepanel,
             sm = tree.getSelectionModel(),
@@ -48,10 +45,6 @@ Ext.define('ZC.OpenVZStackComponentGridPanel',{
         compsNode.findChildBy(function(n){return n.id==compType;}).select();
         sm.resumeEvents();
     }
-});
-
-Ext.define('ZC.ContainerGridPanel',{
-    extend: 'ZC.OpenVZStackComponentGridPanel',
     
     constructor: function(config) {
         config = Ext.applyIf(config||{}, {
