@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configure xmlns="http://namespaces.zope.org/browser">
 
-    <resourceDirectory
-        name="openvz"
-        directory="resources"
-        />
-
-<include xmlns:zcml="http://namespaces.zope.org/zcml" zcml:condition="not-have extjs4" file="templates_ext3.zcml" /> 
-<include xmlns:zcml="http://namespaces.zope.org/zcml" zcml:condition="have extjs4" file="templates_ext4.zcml" />
-
     <viewlet
         name="js-openvz"
-        paths="/++resource++openvz/js/openvz_device.js"
+        paths="/++resource++openvz/js/openvz_device_ext3.js"
         weight="10"
         for="Products.ZenModel.Device.Device"
         manager="Products.ZenUI3.browser.interfaces.IJavaScriptSrcManager"
@@ -20,3 +12,4 @@
         />
 
 </configure>
+
