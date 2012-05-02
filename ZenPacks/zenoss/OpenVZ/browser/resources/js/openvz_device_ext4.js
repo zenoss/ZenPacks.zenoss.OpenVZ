@@ -29,7 +29,7 @@ Ext.apply(Zenoss.render, {
 
 Ext.define('Zenoss.component.OpenVZContainerPanel',{
     extend: 'Zenoss.component.ComponentGridPanel',
-
+    alias: ['widget.OpenVZContainerPanel'],
     jumpToEntity: function(uid, name) {
         var tree = Ext.getCmp('deviceDetailNav').treepanel,
             sm = tree.getSelectionModel(),
