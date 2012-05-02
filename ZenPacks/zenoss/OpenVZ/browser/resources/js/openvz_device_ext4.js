@@ -44,8 +44,7 @@ Ext.define('Zenoss.component.OpenVZContainerPanel',{
         sm.suspendEvents();
         compsNode.findChildBy(function(n){return n.id==compType;}).select();
         sm.resumeEvents();
-    }
-    
+    },
     constructor: function(config) {
         config = Ext.applyIf(config||{}, {
             autoExpandColumn: 'description',
