@@ -5,7 +5,7 @@
 NAME = "ZenPacks.zenoss.OpenVZ"
 VERSION = "1.0.2"
 AUTHOR = "Zenoss"
-LICENSE = ""
+LICENSE = "GPLv2"
 NAMESPACE_PACKAGES = ['ZenPacks', 'ZenPacks.zenoss']
 PACKAGES = ['ZenPacks', 'ZenPacks.zenoss', 'ZenPacks.zenoss.OpenVZ']
 INSTALL_REQUIRES = []
