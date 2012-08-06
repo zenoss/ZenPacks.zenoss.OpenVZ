@@ -21,6 +21,7 @@ from ZenPacks.zenoss.OpenVZ.Container import Container
 
 # This will load new impact rules.
 
+
 class BaseRelationsProvider(object):
     relationship_provider = "OpenVZ"
 
@@ -29,6 +30,7 @@ class BaseRelationsProvider(object):
 
     def belongsInImpactGraph(self):
         return True
+
 
 class DeviceRelationsProvider(BaseRelationsProvider):
     implements(IRelationshipDataProvider)
@@ -49,7 +51,7 @@ class DeviceRelationsProvider(BaseRelationsProvider):
                 IGlobalIdentifier(ve).getGUID(),
                 self.relationship_provider
             )
-        
+
         comp = self._object.getOpenVZComponentOnHost()
         if comp:
 
@@ -61,8 +63,8 @@ class DeviceRelationsProvider(BaseRelationsProvider):
             e1 = IGlobalIdentifier(comp).getGUID()
             e2 = IGlobalIdentifier(self._object.device()).getGUID()
 
-            yield ImpactEdge( e1, e2, self.relationship_provider )
-            yield ImpactEdge( e2, e1, self.relationship_provider )
+            yield ImpactEdge(e1, e2, self.relationship_provider)
+            yield ImpactEdge(e2, e1, self.relationship_provider)
 
 
 class ContainerRelationsProvider(BaseRelationsProvider):
@@ -75,7 +77,7 @@ class ContainerRelationsProvider(BaseRelationsProvider):
         # on the physical node. We are agreeing with the ImpactEdge defined in
         # DeviceRelationsProvider, just expressing this identical relationship
         # from the Container's perspective. When defining ImpactEdges, you
-        # always want to define impact relationships from both sides like this. 
+        # always want to define impact relationships from both sides like this.
 
         yield ImpactEdge(
             IGlobalIdentifier(self._object.device()).getGUID(),
@@ -93,8 +95,9 @@ class ContainerRelationsProvider(BaseRelationsProvider):
             e1 = IGlobalIdentifier(self._object.device()).getGUID()
             e2 = IGlobalIdentifier(md).getGUID()
 
-            yield ImpactEdge( self.relationship_provider, e1, e2 )
-            yield ImpactEdge( self.relationship_provider, e2, e1 )
+            yield ImpactEdge(self.relationship_provider, e1, e2)
+            yield ImpactEdge(self.relationship_provider, e2, e1)
+
 
 # This following code is designed to set the the impact state of a container to down when
 # the container is not running, thus causing any related services to be treated as down.
@@ -102,7 +105,7 @@ class ContainerRelationsProvider(BaseRelationsProvider):
 class ContainerStateProvider(object):
     implements(IStateProvider)
 
-    def __init__(self,adapted):
+    def __init__(self, adapted):
         self._object = adapted
 
     @property

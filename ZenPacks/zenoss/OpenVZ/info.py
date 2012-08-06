@@ -12,6 +12,7 @@ from Products.Zuul.infos.component import ComponentInfo
 
 from ZenPacks.zenoss.OpenVZ.interfaces import IContainerInfo
 
+
 class BaseComponentInfo(ComponentInfo):
     title = ProxyProperty('title')
 
@@ -26,6 +27,7 @@ class BaseComponentInfo(ComponentInfo):
     def icon(self):
         return self._object.getIconPath()
 
+
 class ContainerInfo(BaseComponentInfo):
     implements(IContainerInfo)
 
@@ -33,12 +35,12 @@ class ContainerInfo(BaseComponentInfo):
     description = ProxyProperty('description')
     hostname = ProxyProperty('hostname')
     ipaddrs = ProxyProperty('ipaddrs')
-    
+
     # put @property first, then @info...
     @property
     @info
     def managed_device(self):
-        return self._object.getManagedDevice()    
+        return self._object.getManagedDevice()
 
     onboot = ProxyProperty('onboot')
     ostemplate = ProxyProperty('ostemplate')

@@ -9,8 +9,7 @@ from zope.interface import implements
 
 from Products.Zuul.interfaces import IReportable
 
-from ZenPacks.zenoss.ZenETL.reportable \
-    import Reportable, MARKER_LENGTH, DEFAULT_STRING_LENGTH
+from ZenPacks.zenoss.ZenETL.reportable import Reportable, DEFAULT_STRING_LENGTH
 
 from ZenPacks.zenoss.OpenVZ.Container import Container
 
@@ -20,6 +19,7 @@ class BaseReportable(Reportable):
 
     def __init__(self, context):
         self.context = context
+
 
 class ContainerReportable(BaseReportable):
     adapts(Container)

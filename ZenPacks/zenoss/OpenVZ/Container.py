@@ -9,6 +9,7 @@ from Products.ZenModel.ManagedEntity import ManagedEntity
 from Products.ZenRelations.RelSchema import ToOne, ToManyCont
 from Products.ZenModel.ZenossSecurity import ZEN_CHANGE_DEVICE
 
+
 class Container(DeviceComponent, ManagedEntity):
     meta_type = portal_type = "OpenVZContainer"
 
@@ -26,9 +27,9 @@ class Container(DeviceComponent, ManagedEntity):
     # not be able to tell that the updates have happened. There are two ways
     # to deal with this. The first is to explicitly call _p_changed on your Component
     # once you have made any changes that need to persist:
-    # 
+    #
     # myContainer._p_changed = True
-    # 
+    #
     # The other method is to use PersistentList() and PersistentDict() as your
     # list and dict objects when you create them, which will allow Zope to detect
     # that they have been changed and persist the changes in the ZODB.
@@ -39,7 +40,7 @@ class Container(DeviceComponent, ManagedEntity):
     # Any changes to the model below will require a restart of zenhub so it is aware
     # of the new model. You will also need to restart zenwebserver so it can access
     # any new properties or methods.
-    
+
     container_status = None
     description = None
     hostname = None
@@ -102,10 +103,10 @@ class Container(DeviceComponent, ManagedEntity):
             device = self.dmd.Devices.findDeviceByIdOrIp(ip)
             if device:
                 return device
-            
+
             # search additional IP addresses that may be associated with interfaces on a device:
 
-            foundip = self.dmd.Networks.findIp(ip) 
+            foundip = self.dmd.Networks.findIp(ip)
             if foundip and foundip.device():
                 return foundip.device()
 

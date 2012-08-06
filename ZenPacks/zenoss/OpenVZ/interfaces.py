@@ -8,8 +8,10 @@ from Products.Zuul.form import schema
 from Products.Zuul.infos.component import IComponentInfo
 from Products.Zuul.utils import ZuulMessageFactory as _t
 
+
 class IContainerInfo(IComponentInfo):
     """Info adapter for OpenVZ Container components."""
+
     container_status = schema.TextLine(title=_t(u'Container Status'))
     description = schema.TextLine(title=_t(u'Description'))
     hostname = schema.TextLine(title=_t(u'Hostname'))
