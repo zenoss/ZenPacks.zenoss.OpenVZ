@@ -29,7 +29,7 @@ class host_util(CommandParser):
         version=lines[0].split()[1]
         pos = 2
         veid = None
-        metrics = {}
+        metrics = { "containers" : {} }
         while pos < len(lines):
             sp = lines[pos].split()
             if len(sp) == 7:
