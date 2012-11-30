@@ -123,7 +123,10 @@ Post-Install Steps
 
 As of version 1.0.2, this ZenPack typically requires no manual post-install
 steps to enable for any OpenVZ host devices. All you need to do is to ensure
-that Zenoss has ``root`` SSH credentials for your OpenVZ host devices.
+that Zenoss has ``root`` SSH credentials for your OpenVZ host devices and that
+the OpenVZ system is in the ``/Server/Linux`` or ``/Server/SSH/Linux`` device
+classes. If you ensure that this is done, a remodel of the device should result
+in OpenVZ containers being monitored and appearing as components for the device.
 
 Modeling OpenVZ Hosts
 ~~~~~~~~~~~~~~~~~~~~~
