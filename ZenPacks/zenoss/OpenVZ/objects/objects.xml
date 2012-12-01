@@ -696,7 +696,7 @@ True
 True
 </property>
 <property type="string" id="maxval" mode="w" >
-here.hw.totalMemory + (0.5 * here.os.totalSwap) / (here.hw.totalMemory + here.os.totalSwap)
+here.hw.totalMemory + (0.5 * here.os.totalSwap) / ((here.hw.totalMemory + here.os.totalSwap) or 1e12)
 </property>
 <property type="string" id="eventClass" mode="w" >
 /Status
@@ -716,7 +716,7 @@ here.hw.totalMemory + (0.5 * here.os.totalSwap) / (here.hw.totalMemory + here.os
 True
 </property>
 <property type="string" id="maxval" mode="w" >
-here.hw.totalMemory + (0.75 * here.os.totalSwap) / (here.hw.totalMemory + here.os.totalSwap)
+here.hw.totalMemory + (0.75 * here.os.totalSwap) / ((here.hw.totalMemory + here.os.totalSwap) or 1e12)
 </property>
 <property type="string" id="eventClass" mode="w" >
 /Status
