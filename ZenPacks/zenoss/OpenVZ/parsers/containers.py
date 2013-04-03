@@ -5,6 +5,12 @@
 #
 ###########################################################################
 
+# To debug this command parser, run the following command as the zenoss user:
+# zencommand run -v10 --showfullcommand --showrawresults --device=<device_id>
+
+# As a ZenPack developer, when specifying the command to run on the command-line,
+# a "$" must be entered as "$$". If you type "$$", bash will see "$".
+
 from Products.ZenRRD.CommandParser import CommandParser
 from ZenPacks.zenoss.OpenVZ.util import VEStatParser
  
@@ -30,6 +36,7 @@ class containers(CommandParser):
         pos = 0
         bclines = []
         stlines = []
+        iolines = []
 
         # /proc/user_beancounters lines
         while pos < len(lines) and lines[pos] != "#beancounters-end":
@@ -40,6 +47,12 @@ class containers(CommandParser):
         while pos < len(lines) and lines[pos] != "#vestat-end":
             stlines.append(lines[pos])
             pos += 1
+        pos += 1
+        while pos < len(lines) and lines[pos] != "#iostat end":
+            iolines.append(lines[pos])
+
+        # process beancounters lines:
+
         lines = bclines
         pos = 2
         veid = None
@@ -56,6 +69,29 @@ class containers(CommandParser):
                 if veid not in metrics:
                     metrics[veid] = {}
                 metrics[veid].update({ r : sp[1], "%s.maxheld" % r : sp[2], "%s.barrier" % r : sp[3], "%s.limit" % r : sp[4], "%s.failcnt" % r : sp[5] })
+            pos += 1
+
+        # augment with ioacct lines:
+
+        lines = iolines
+        veid = None
+        while pos < len(lines):
+            sp = lines[pos].split()
+            # expecting a line like this: "#ioacct /proc/bc/102/ioacct". The "102" is the VEID of the metrics that follow:
+            if len(sp) == 2 and sp[0] == "#ioacct" and sp[1][:9] == "/proc/bc/":
+                veid = sp[1][9:].split("/")[0]
+            else:
+                # this should not happen, but we check anyway. We can't record metrics if we haven't found the VEID yet.
+                if veid == None:
+                    pos += 1
+                    continue
+                if veid not in metrics:
+                    metrics[veid] = {}
+                metric = sp[0]
+                if metric in ( "read", "write", "dirty", "cancel", "missed"):
+                    metric += "bytes"
+                metric = "ioacct." + metric
+                metrics[veid][metric] = sp[1]
             pos += 1
 
         # OK, now we have a data structure that looks like this:
@@ -94,20 +130,24 @@ class containers(CommandParser):
             
             psplit = point.id.split(".")
             # pname = eg. "physpages"
-            pname = psplit[0]
             # psuf = eg. "barrier", or None
             vestat = False
             if len(psplit) == 2:
-                psuf = psplit[1]
+                if pname == "ioacct":
+                    pname = point.id
+                    psuf = None
+                else:
+                    pname = psplit[0]
+                    psuf = psplit[1]
             elif len(psplit) == 3 and psplit[0] == "vestat":
                 pname = psplit[1]
                 psuf = psplit[2]
                 vestat = True
             else:
+                pname = psplit[0]
                 psuf = None
             if not vestat:
-                # BEANCOUNTERS
-                if pname[-5:] == "bytes":
+                if pname[-5:] == "bytes" and pname[:-5] + "pages" in metrics:
                     # source data is equivalent pages data:
                     pname = pname[:-5] + "pages"
                     mult = page_size
@@ -156,3 +196,4 @@ class containers(CommandParser):
                 if point.component in vestatdata and pname in vestatcols:
                     val = int(vestatdata[point.component][veindex]) * mult
                     result.values.append((point, val))
+# vim: set ts=4 sw=4 expandtab: 

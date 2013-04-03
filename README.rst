@@ -287,11 +287,11 @@ metrics. This may be added in a future release.
 Beancounters
 ~~~~~~~~~~~~
 
-The ``openvz`` datasource also pulls data from the OpenVZ host device's 
-``/proc/user_beancounters`` file. Like the vestat data points, this ZenPack
-includes some beancounters data points that are already defined for you,
-but additional ones you may be interested can also be defined and will
-be populated with data by the ``OpenVZContainer`` monitoring template
+The ``openvz`` datasource also pulls data from the OpenVZ host device's
+``/proc/user_beancounters`` file, which contains a number of container-specific
+metrics. This ZenPack includes some beancounters data points that are already
+defined for you, but additional ones you may be interested can also be defined
+and will be populated with data by the ``OpenVZContainer`` monitoring template
 if found.
 
 These data points will appear with the prefix ``openvz.`` in the Data Points
@@ -345,6 +345,34 @@ regarding Data Points:
 * There is an additional ``.failrate`` suffix that can be created as a 
   DERIVED RRD Type with a minimum value of 0 and used for firing events when the
   value increments.
+
+IO Accounting
+~~~~~~~~~~~~~
+
+This ZenPacks also collects various container-specific IO metrics:
+
+* ``ioacct.readbytes``
+* ``ioacct.writebytes``
+* ``ioacct.dirtybytes``
+* ``ioacct.cancelbytes``
+* ``ioacct.missedbytes``
+* ``ioacct.syncs_total``
+* ``ioacct.fsyncs_total``
+* ``ioacct.fdatasyncs_total``
+* ``ioacct.range_syncs_total``
+* ``ioacct.io_pbs``
+* ``ioacct.fuse_requests``
+* ``ioacct.fuse_bytes``
+
+The above metrics are incrementing counts.
+
+* ``ioacct.syncs_active``
+* ``ioacct.fsyncs_active``
+* ``ioacct.fdatasyncs_active``
+* ``ioacct.range_syncs_active``
+
+The above metrics are currently-active sync statistics that will go back to
+zero when there is no disk activity.
 
 Host Metrics and Graphs
 -----------------------
