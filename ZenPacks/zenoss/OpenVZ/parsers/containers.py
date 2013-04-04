@@ -9,7 +9,9 @@
 # zencommand run -v10 --showfullcommand --showrawresults --device=<device_id>
 
 # As a ZenPack developer, when specifying the command to run on the command-line,
-# a "$" must be entered as "$$". If you type "$$", bash will see "$".
+# a "$" must be entered as "$$". If you type "$$", bash will see "$". If this is
+# not done, an event will appear in Zenoss UI containing a traceback due to the
+# TALES parser failing.
 
 from Products.ZenRRD.CommandParser import CommandParser
 from ZenPacks.zenoss.OpenVZ.util import VEStatParser
@@ -50,6 +52,7 @@ class containers(CommandParser):
         pos += 1
         while pos < len(lines) and lines[pos] != "#iostat end":
             iolines.append(lines[pos])
+            pos += 1
 
         # process beancounters lines:
 
@@ -75,23 +78,25 @@ class containers(CommandParser):
 
         lines = iolines
         veid = None
+        pos = 0
         while pos < len(lines):
             sp = lines[pos].split()
             # expecting a line like this: "#ioacct /proc/bc/102/ioacct". The "102" is the VEID of the metrics that follow:
-            if len(sp) == 2 and sp[0] == "#ioacct" and sp[1][:9] == "/proc/bc/":
-                veid = sp[1][9:].split("/")[0]
-            else:
-                # this should not happen, but we check anyway. We can't record metrics if we haven't found the VEID yet.
-                if veid == None:
-                    pos += 1
-                    continue
-                if veid not in metrics:
-                    metrics[veid] = {}
-                metric = sp[0]
-                if metric in ( "read", "write", "dirty", "cancel", "missed"):
-                    metric += "bytes"
-                metric = "ioacct." + metric
-                metrics[veid][metric] = sp[1]
+            if len(sp) == 2:
+                if sp[0] == "#ioacct" and sp[1][:9] == "/proc/bc/":
+                    veid = sp[1][9:].split("/")[0]
+                else:
+                    # this should not happen, but we check anyway. We can't record metrics if we haven't found the VEID yet.
+                    if veid == None:
+                        pos += 1
+                        continue
+                    if veid not in metrics:
+                        metrics[veid] = {}
+                    metric = sp[0]
+                    if metric in ( "read", "write", "dirty", "cancel", "missed"):
+                        metric += "bytes"
+                    metric = "ioacct." + metric
+                    metrics[veid][metric] = sp[1]
             pos += 1
 
         # OK, now we have a data structure that looks like this:
@@ -127,8 +132,8 @@ class containers(CommandParser):
             # need to pre-define tons of data points which will result in huge amounts of RRD data. Users just need to
             # add the datapoints of the data that they are actually interested in, and as long as the name matches, we
             # grab the data they want. 
-            
             psplit = point.id.split(".")
+            pname = psplit[0]
             # pname = eg. "physpages"
             # psuf = eg. "barrier", or None
             vestat = False
@@ -147,10 +152,11 @@ class containers(CommandParser):
                 pname = psplit[0]
                 psuf = None
             if not vestat:
-                if pname[-5:] == "bytes" and pname[:-5] + "pages" in metrics:
-                    # source data is equivalent pages data:
-                    pname = pname[:-5] + "pages"
-                    mult = page_size
+                if pname[-5:] == "bytes":
+                    if pname[:-5] + "pages" in metrics:
+                        # source data is equivalent pages data:
+                        pname = pname[:-5] + "pages"
+                        mult = page_size
             
                 if psuf == "failrate":
                     # We support a special datapoint called "failrate" which can be a DERIVED RRD, used to trigger when
@@ -159,14 +165,13 @@ class containers(CommandParser):
                     # source data is failcnt:
                     psuf = "failcnt"
                 
-                # pnt defines where in the dict to get the source data 
+                # pnt defines where in the dict to get the source data. It is based on pname, set earlier.
                 pnt = pname
                 if psuf:
                     pnt += "." + psuf
                     if psuf[:4] == "fail":
                         # don't multiply the failcnt/rate
                         mult = 1
-
                 # write out our beancounters RRD data:
                 if point.component in metrics and pnt in metrics[point.component]:
                     val = int(metrics[point.component][pnt]) * mult

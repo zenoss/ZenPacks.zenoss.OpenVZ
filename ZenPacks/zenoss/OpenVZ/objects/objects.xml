@@ -184,7 +184,7 @@ False
 True
 </property>
 <property type="long" id="sequence" mode="w" >
-3
+0
 </property>
 <tomanycont id='graphPoints'>
 <object id='Nice Time' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
@@ -299,7 +299,7 @@ False
 True
 </property>
 <property type="long" id="sequence" mode="w" >
-4
+1
 </property>
 <tomanycont id='graphPoints'>
 <object id='ioacct.readbytes' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
@@ -532,7 +532,7 @@ False
 True
 </property>
 <property type="long" id="sequence" mode="w" >
-0
+3
 </property>
 <tomanycont id='graphPoints'>
 <object id='Maximum Held' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
@@ -621,7 +621,7 @@ False
 True
 </property>
 <property type="long" id="sequence" mode="w" >
-1
+4
 </property>
 <tomanycont id='graphPoints'>
 <object id='Maximum Held' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
