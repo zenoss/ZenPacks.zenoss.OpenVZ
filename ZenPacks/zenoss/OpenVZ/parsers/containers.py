@@ -161,7 +161,7 @@ class containers(CommandParser):
                 psuf = None
             if not vestat:
                 if pname[-5:] == "bytes":
-                    if pname[:-5] + "pages" in metrics:
+                    if pname[:-5] in ( "locked", "privvm", "shm", "phys", "vmguar", "oomguar" ):
                         # source data is equivalent pages data:
                         pname = pname[:-5] + "pages"
                         mult = page_size
