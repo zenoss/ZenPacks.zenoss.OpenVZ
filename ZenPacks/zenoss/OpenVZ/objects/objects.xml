@@ -289,6 +289,9 @@ AVERAGE
 <property type="int" id="width" mode="w" >
 500
 </property>
+<property type="string" id="units" mode="w" >
+bytes
+</property>
 <property type="boolean" id="log" mode="w" >
 False
 </property>
@@ -308,7 +311,7 @@ True
 4
 </property>
 <tomanycont id='graphPoints'>
-<object id='ioacct.readbytes' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
+<object id='Bytes read' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
 <property type="long" id="sequence" mode="w" >
 0
 </property>
@@ -322,7 +325,7 @@ LINE
 False
 </property>
 <property type="string" id="format" mode="w" >
-%5.2lf%s
+%9.0lf%s
 </property>
 <property type="string" id="legend" mode="w" >
 ${graphPoint/id}
@@ -337,7 +340,7 @@ openvz_ioacct.readbytes
 AVERAGE
 </property>
 </object>
-<object id='ioacct.writebytes' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
+<object id='Bytes written' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
 <property type="long" id="sequence" mode="w" >
 1
 </property>
@@ -351,7 +354,7 @@ LINE
 False
 </property>
 <property type="string" id="format" mode="w" >
-%5.2lf%s
+%9.0lf%s
 </property>
 <property type="string" id="legend" mode="w" >
 ${graphPoint/id}
