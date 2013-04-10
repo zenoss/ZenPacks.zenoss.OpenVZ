@@ -11,7 +11,15 @@
 # As a ZenPack developer, when specifying the command to run on the command-line,
 # a "$" must be entered as "$$". If you type "$$", bash will see "$". If this is
 # not done, an event will appear in Zenoss UI containing a traceback due to the
-# TALES parser failing.
+# TALES parser failing. Note that this event will be in the global event queue
+# and will not be associated with the device that is being monitored.
+
+# Also note that if you fix a command parser in the UI (ie. change "$" to "$$"),
+# you will need to re-export the ZenPack to have the changes reflected in your
+# git repo. And Zenoss only parses objects.xml when it installs ZenPacks, or when
+# you update the ZenPack via the UI. So if you fix objects.xml on one machine,
+# then pull the changes on to another machine, you will need to uninstall and
+# reinstall the ZenPack for the command changes to take effect.
 
 from Products.ZenRRD.CommandParser import CommandParser
 from ZenPacks.zenoss.OpenVZ.util import VEStatParser
