@@ -23,7 +23,7 @@ ${here/id}
 0
 </property>
 <property type="string" id="commandTemplate" mode="w" >
-/usr/bin/env cat /proc/user_beancounters &amp;&amp; echo "#beancounters-end" &amp;&amp; cat /proc/vz/vestat &amp;&amp; echo "#vestat-end" &amp;&amp; for x in $$(ls /proc/bc/*/ioacct 2&gt;/dev/null); do echo "#ioacct $$x"; cat $x; done &amp;&amp; echo "#ioacct end"
+/usr/bin/env cat /proc/user_beancounters &amp;&amp; echo "#beancounters-end" &amp;&amp; cat /proc/vz/vestat &amp;&amp; echo "#vestat-end" &amp;&amp; for x in $$(ls /proc/bc/*/ioacct 2&gt;/dev/null); do echo "#ioacct $$x"; cat $$x; done &amp;&amp; echo "#ioacct end"
 </property>
 <property type="int" id="cycletime" mode="w" >
 300
@@ -37,18 +37,24 @@ ZenPacks.zenoss.OpenVZ.parsers.containers
 <tomanycont id='datapoints'>
 <object id='ioacct.readbytes' module='Products.ZenModel.RRDDataPoint' class='RRDDataPoint'>
 <property select_variable="rrdtypes" type="selection" id="rrdtype" mode="w" >
-GAUGE
+DERIVE
 </property>
 <property type="boolean" id="isrow" mode="w" >
 True
+</property>
+<property type="string" id="rrdmin" mode="w" >
+0
 </property>
 </object>
 <object id='ioacct.writebytes' module='Products.ZenModel.RRDDataPoint' class='RRDDataPoint'>
 <property select_variable="rrdtypes" type="selection" id="rrdtype" mode="w" >
-GAUGE
+DERIVE
 </property>
 <property type="boolean" id="isrow" mode="w" >
 True
+</property>
+<property type="string" id="rrdmin" mode="w" >
+0
 </property>
 </object>
 <object id='numfile' module='Products.ZenModel.RRDDataPoint' class='RRDDataPoint'>
@@ -184,7 +190,7 @@ False
 True
 </property>
 <property type="long" id="sequence" mode="w" >
-0
+3
 </property>
 <tomanycont id='graphPoints'>
 <object id='Nice Time' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
@@ -299,7 +305,7 @@ False
 True
 </property>
 <property type="long" id="sequence" mode="w" >
-1
+4
 </property>
 <tomanycont id='graphPoints'>
 <object id='ioacct.readbytes' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
@@ -532,7 +538,7 @@ False
 True
 </property>
 <property type="long" id="sequence" mode="w" >
-3
+0
 </property>
 <tomanycont id='graphPoints'>
 <object id='Maximum Held' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
@@ -621,7 +627,7 @@ False
 True
 </property>
 <property type="long" id="sequence" mode="w" >
-4
+1
 </property>
 <tomanycont id='graphPoints'>
 <object id='Maximum Held' module='Products.ZenModel.DataPointGraphPoint' class='DataPointGraphPoint'>
