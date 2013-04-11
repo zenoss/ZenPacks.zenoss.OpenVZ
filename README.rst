@@ -30,6 +30,15 @@ and alerting functions within the container.
 ChangeLog
 ---------
 
+2.0 April 11, 2013
+~~~~~~~~~~~~~~~~~~
+
+* Added IO utilization graph for containers.
+
+* Various corner-case traceback fixes.
+
+* Zenoss 4.2 compatibility.
+
 * Adding screenshots to RST documentation.
 
 1.1 January 19, 2012
@@ -238,10 +247,12 @@ that will appear for each Container component on an OpenVZ host:
 * open files
 * memory utilization
 * CPU utilization
+* IO utilization (new in 2.0)
 
 The first three graphs are generated using data extracted from
 ``/proc/user_beancounters`` on the OpenVZ host. The CPU utilization graph is
-generated using ``/proc/vz/vestat`` information.
+generated using ``/proc/vz/vestat`` information. IO Utilization is generated
+using ``/proc/bc/.../ioacct`` information.
 
 vestat
 ~~~~~~
